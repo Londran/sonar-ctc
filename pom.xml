@@ -12,6 +12,14 @@
     <name>Verifysoft Technology GmbH</name>
     <url>http://www.verifysoft.com</url>
   </organization>
+  <inceptionYear>2014</inceptionYear>
+  <licenses>
+    <license>
+      <name>GNU LGPL v3</name>
+      <url>http://www.gnu.org/licenses/lgpl.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
 
   <dependencies>
     <dependency>

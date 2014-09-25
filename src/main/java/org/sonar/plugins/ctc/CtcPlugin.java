@@ -1,6 +1,6 @@
 /*
  * Testwell CTC++ Plugin
- * Copyright (C) 2010 Verifysoft Technology GmbH
+ * Copyright (C) 2014 Verifysoft Technology GmbH
  * dev@sonar.codehaus.org
  *
  * This program is free software; you can redistribute it and/or

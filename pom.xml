@@ -43,6 +43,20 @@
       <artifactId>mockito-core</artifactId>
       <version>1.9.5</version>
     </dependency>
+    <dependency>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy-all</artifactId>
+      <version>2.0.7</version>
+      <scope>test</scope>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>1.1.2</version>
+      <scope>test</scope>
+      <optional>true</optional>
+    </dependency>
   </dependencies>
 
   <parent>

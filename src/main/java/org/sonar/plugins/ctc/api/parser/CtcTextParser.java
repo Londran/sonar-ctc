@@ -49,9 +49,13 @@ public class CtcTextParser implements CtcParser {
   private final static Logger log = LoggerFactory.getLogger(CtcTextParser.class);
 
   public CtcTextParser(File report) throws FileNotFoundException {
+    this(report,new EnumMap<CtcPattern, String>(CtcPattern.class));
+  }
+
+  public CtcTextParser(File report, Map<CtcPattern,String> map) throws FileNotFoundException {
     scanner = new Scanner(report).useDelimiter(SECTION_SEP);
     matcher = APPENDAGE.matcher("");
-    projectDetails = new EnumMap<CtcPattern, String>(CtcPattern.class);
+    projectDetails = map;
     sb = new StringBuilder();
 
     if (scanner.findWithinHorizon(MON_SYM.PATTERN,0) == null) {

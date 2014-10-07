@@ -1,7 +1,5 @@
 package org.sonar.plugins.ctc.api.parser;
 
-import org.sonar.plugins.ctc.api.parser.CtcTextParser;
-
 import java.io.File;
 
 public class SmallCtcTextParserTest extends CtcTextParserTest {

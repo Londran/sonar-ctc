@@ -19,10 +19,12 @@
  */
 package org.sonar.plugins.ctc.api.measures;
 
+import org.sonar.plugins.ctc.api.parser.CtcPattern;
+
 import java.util.Map;
 
 public interface CtcReport extends Iterable<CtcFileMeasure> {
 
-  Map<String,String> getReportDetails();
+  Map<CtcPattern,String> getReportDetails();
 
 }

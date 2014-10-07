@@ -19,21 +19,61 @@
  */
 package org.sonar.plugins.ctc.api.measures;
 
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.sonar.plugins.ctc.api.parser.CtcPattern;
+import org.sonar.plugins.ctc.api.parser.CtcTextParser;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Collections;
+import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 public class CtcTextReport implements CtcReport {
 
+  private final File file;
+  private final Map<CtcPattern,String> projectDetails;
+
+  private final static Logger log = LoggerFactory.getLogger(CtcTextReport.class);
+
+  public CtcTextReport(File file) {
+    this.file = file;
+    this.projectDetails = new EnumMap<CtcPattern, String>(CtcPattern.class);
+  }
+
   @Override
   public Iterator<CtcFileMeasure> iterator() {
-    // TODO Auto-generated method stub
-    return null;
+
+    try {
+      return new CtcTextParser(file,projectDetails);
+    } catch (FileNotFoundException e) {
+      log.error("Report not found.",e);
+      return new EmptyIterator();
+    }
   }
 
   @Override
-  public Map<String, String> getReportDetails() {
-    // TODO Auto-generated method stub
-    return null;
+  public Map<CtcPattern, String> getReportDetails() {
+    return projectDetails;
   }
 
+  private static class EmptyIterator implements Iterator<CtcFileMeasure> {
+    @Override
+    public boolean hasNext() {
+      return false;
+    }
+
+    @Override
+    public CtcFileMeasure next() {
+      throw new NoSuchElementException();
+    }
+
+    @Override
+    public void remove() {
+      throw new UnsupportedOperationException();
+    }
+  }
 }

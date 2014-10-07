@@ -17,31 +17,43 @@
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
-package parser;
+package org.sonar.plugins.ctc.api.parser;
 
 import java.util.regex.Pattern;
 import static java.util.regex.Pattern.*;
 
 public enum CtcPattern {
 
-  MON_SYM("^Symbol file(s) used   : "),
-  MON_DAT("^Data file(s) used     : "),
-  LIS_DTE("^Listing produced at   : "),
-  COV_VIW("^Coverage view         : "),
-  SRC_FLS("^Source files       : "),
-  SRC_LNS("^Source lines       : "),
-  MEA_PTS("^Measurement points : ");
+  MON_SYM("Symbol file(s) used   : "),
+  MON_DAT("Data file(s) used     : "),
+  LIS_DTE("Listing produced at   : "),
+  COV_VIW("Coverage view         : "),
+  SRC_FLS("Source files       : ","(.*)$"),
+  SRC_LNS("Source lines       : ","(.*)$"),
+  MEA_PTS("Measurement points : ","(.*)$");
 
   public static final Pattern APPENDAGE = compile("^\\s+(.*)$",MULTILINE);
   public static final Pattern MONI_SRC = compile("^MONITORED (.{6}) FILE : (.*)$",MULTILINE);
   public static final Pattern INST_MOD = compile("^INSTRUMENTATION MODE  : (.*)$",MULTILINE);
   public static final Pattern SECTION_SEP = compile("^-{77}|={77}$",MULTILINE);
-  public static final Pattern LINE_RESULT = compile(" {0,10}(\\d+)? {1,11}(\\d+)? (?: |-) +(\\d+) (.*)$",MULTILINE);
+  public static final Pattern LINE_RESULT = compile("^(?: {10}| *(\\d+)) (?: {10}| *(\\d+)) -? *(\\d+) (.*)$",MULTILINE);
+  public static final Pattern FILE_RESULT = compile("^(?:(\\Q***TER\\E)| {6}) *\\d+ % \\( *(\\d+)/ *(\\d+)\\) (?:of FILE (.*)|(statement))$",MULTILINE);
+  public static final Pattern SUMMARY = compile("^SUMMARY$",MULTILINE);
+
+  /*
+***TER  82 % ( 14/ 17) of FUNCTION Calc::isPrime()
+        91 % ( 10/ 11) statement
+   */
+
 
   public final Pattern PATTERN;
 
   private CtcPattern(String key) {
-    PATTERN = compile("^\\Q"+key+"\\E.+: (.*)$", Pattern.MULTILINE);
+    this(key,"");
+  }
+
+  private CtcPattern(String key, String value) {
+    PATTERN = compile("^"+quote(key)+value, MULTILINE);
   }
 
 }

@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.sonar.api.measures.Metrics;
 
+@SuppressWarnings("rawtypes")
 public class CtcMetrics implements Metrics {
 
   public static final Metric IDE_IS_JAVA =

@@ -6,4 +6,4 @@ appender("CONSOLE", ConsoleAppender) {
 
 root(INFO,["CONSOLE"]);
 
-logger("org.sonar.plugins.ctc.api.CtcTextParserTest",TRACE)
+logger("org.sonar.plugins.ctc.api.parser.CtcTextParser",TRACE)

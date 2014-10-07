@@ -17,28 +17,25 @@
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
-package parser;
+package org.sonar.plugins.ctc.api.parser;
 
-import org.sonar.plugins.ctc.api.exceptions.CtcInvalidReportException;
-import org.sonar.plugins.ctc.api.measures.CtcFileMeasure;
-import org.sonar.plugins.ctc.api.measures.CtcFileMeasure.Builder;
-import org.slf4j.MarkerFactory;
-import org.slf4j.helpers.BasicMarkerFactory;
-import org.slf4j.Marker;
-import com.google.common.collect.AbstractIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
+import org.sonar.plugins.ctc.api.exceptions.CtcInvalidReportException;
+import org.sonar.plugins.ctc.api.measures.CtcFileMeasure;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Arrays;
 import java.util.EnumMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 
-import static parser.CtcPattern.*;
+import static org.sonar.plugins.ctc.api.parser.CtcPattern.*;
 
 public class CtcTextParser implements CtcParser {
 
@@ -48,10 +45,6 @@ public class CtcTextParser implements CtcParser {
   private final StringBuilder sb;
 
   private final static Marker FOUND = MarkerFactory.getMarker("FOUND");
-
-
-  private CtcFileMeasure nextElement;
-
 
   private final static Logger log = LoggerFactory.getLogger(CtcTextParser.class);
 
@@ -65,20 +58,26 @@ public class CtcTextParser implements CtcParser {
       logInvalidReport();
     }
     addAppended(MON_DAT);
-    projectDetails.put(MON_SYM, ","+sb.toString());
+    addDetail(MON_SYM, ","+sb.toString());
     // MON.sym added + additional *.sym-files
     // MON.dat has been found and could be added instantly
 
     sb.setLength(0);
-    sb.append(scanner.nextLine());
+
     addAppended(LIS_DTE);
-    projectDetails.put(MON_DAT, sb.toString());
-    projectDetails.put(LIS_DTE, scanner.nextLine());
+    addDetail(MON_DAT, sb.toString());
+    addDetail(LIS_DTE,scanner.nextLine());
 
     if (scanner.findInLine(COV_VIW.PATTERN) == null) {
       logInvalidReport();
     }
-    projectDetails.put(COV_VIW, scanner.nextLine());
+    addDetail(COV_VIW, scanner.nextLine());
+    matcher.reset(scanner.next());
+  }
+
+  private void addDetail(CtcPattern key, String value) {
+    projectDetails.put(key, value);
+    log.debug(FOUND,"Detail '{}':'{}'",key,value);
   }
   /* Appends additional files. Scannercursor points at value of
    * nextKey.
@@ -88,6 +87,7 @@ public class CtcTextParser implements CtcParser {
     sb.append(scanner.nextLine());
     while(scanner.findInLine(nextKey.PATTERN) == null) {
       if (matcher.reset(scanner.nextLine()).matches()) {
+        sb.append(",");
         sb.append(matcher.group(1));
       } else {
         logInvalidReport();
@@ -96,28 +96,70 @@ public class CtcTextParser implements CtcParser {
   }
 
   private void parseFileHeader() {
-    matcher.usePattern(MONI_SRC);
+    matcher.usePattern(MONI_SRC).reset();
     if (matcher.find()) {
       log.debug(FOUND,"MONITORED {} FILE : {}",matcher.group(1),matcher.group(2));
+    } else {
+      logInvalidReport();
     }
     matcher.usePattern(INST_MOD);
     if (matcher.find()) {
-      log.debug(FOUND,"MONITORED {} FILE : {}",matcher.group(1),matcher.group(2));
+      log.debug(FOUND,"INSTRUMENTATION MODE: {}",matcher.group(1));
+    } else {
+      logInvalidReport();
     }
+    parseFileBody();
   }
 
   private void parseFileBody() {
-    
+    if(matcher.usePattern(LINE_RESULT).reset(scanner.next()).find()) {
+      do {
+        log.trace(FOUND,"Line found!");
+      } while (matcher.find());
+      parseFileBody();
+    } else if (matcher.usePattern(FILE_RESULT).reset().find()) {
+      parseFileFooter();
+    } else {
+      logInvalidReport();
+    }
+
+  }
+
+  private void parseFileFooter() {
+    if (matcher.group(1) == null) {
+      logInvalidReport();
+    }
+    log.debug(FOUND,"Found Result for: {}",matcher.group(4));
+    log.trace(FOUND,"({}/{})",matcher.group(2),matcher.group(3));
+
+    if (matcher.find()) {
+      if (matcher.group(1) != null | matcher.group(5) == null) {
+        logInvalidReport();
+      }
+      log.trace(FOUND,"Found statements ({}/{})",matcher.group(2),matcher.group(3));
+    }
+    if (matcher.usePattern(SUMMARY).reset(scanner.next()).find()) {
+      log.debug("Found end of Report!");
+      for (CtcPattern key : Arrays.asList(SRC_FLS,SRC_LNS,MEA_PTS)) {
+        if (!matcher.usePattern(key.PATTERN).find()) {
+          logInvalidReport();
+        } else {
+          addDetail(key, matcher.group(1));
+        }
+      }
+    }
   }
 
   private void logInvalidReport() {
     log.error("INVALID REPORT!");
+    log.trace(matcher.toString());
+
     throw new CtcInvalidReportException();
   }
 
   @Override
   public boolean hasNext() {
-    return false;
+    return scanner.hasNext();
   }
 
   @Override
@@ -125,7 +167,8 @@ public class CtcTextParser implements CtcParser {
     if (!hasNext()) {
       throw new NoSuchElementException();
     }
-    return this.nextElement;
+    parseFileHeader();
+    return null;
   }
 
   @Override

@@ -17,8 +17,27 @@
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
-package org.sonar.plugins.ctc.api;
+package org.sonar.plugins.ctc.api.measures;
+
+import java.util.NoSuchElementException;
 
 public class CtcFileMeasure {
 
+  public static final Builder endOfData = new Builder() {
+    public CtcFileMeasure build() {
+      throw new NoSuchElementException();
+    }
+  };
+
+  public static class Builder {
+    private Builder() {};
+
+    public Builder create() {
+      return new Builder();
+    }
+
+    public CtcFileMeasure build() {
+      return null;
+    }
+  }
 }

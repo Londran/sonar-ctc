@@ -17,13 +17,15 @@
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
-package org.sonar.plugins.ctc.api;
+package parser;
+
+import org.sonar.plugins.ctc.api.measures.CtcFileMeasure;
 
 import java.util.Iterator;
 import java.util.Map;
 
 public interface CtcParser extends Iterator<CtcFileMeasure> {
 
-  Map<CtcReportDetailKey, String> getReportDetails();
+  Map<CtcPattern, String> getReportDetails();
 
 }

@@ -17,30 +17,24 @@
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
-package org.sonar.plugins.ctc.api;
+package org.sonar.plugins.ctc.api.measures;
 
-import java.util.regex.Pattern;
+import org.sonar.api.measures.Metric;
 
-public enum CtcReportDetailKey {
+import java.util.List;
 
-  MON_SYM("^\\QSymbol file(s) used   : \\E"),
-  MON_DAT("^\\QData file(s) used     : \\E"),
-  LIST_DATE("^\\QListing produced at   : \\E"),
-  COV_VIEW("^\\QCoverage view         : \\E"),
-  SRC_FILES("^\\QSource files       : \\E"),
-  SRC_LINES("^\\QSource lines       : \\E"),
-  MEASUREMENT_POINTS("^\\QMeasurement points : \\E"),
-  TER_CONDITION("^\\QTER                : \\E"),
-  TER_STATEMENT("^\\QTER                : \\E");
+import org.sonar.api.measures.Metrics;
 
-  private final Pattern pattern;
+public class CtcMetrics implements Metrics {
 
-  private CtcReportDetailKey(String pattern) {
-    this.pattern = Pattern.compile(pattern, Pattern.MULTILINE);
-  }
+  public static final Metric IDE_IS_JAVA =
+    new Metric.Builder("ide_is_java","Java project",Metric.ValueType.BOOL)
+    .create();
 
-  public Pattern getPattern() {
-    return pattern;
+  @Override
+  public List<Metric> getMetrics() {
+
+    return null;
   }
 
 }

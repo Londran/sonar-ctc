@@ -19,6 +19,8 @@
  */
 package org.sonar.plugins.ctc.api.measures;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import org.sonar.api.measures.Metric;
 import org.sonar.api.measures.Metric.Builder;
 import org.sonar.api.measures.Metrics;
@@ -26,6 +28,10 @@ import org.sonar.api.measures.SumChildValuesFormula;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import static org.sonar.api.measures.CoreMetrics.DOMAIN_OVERALL_TESTS;
@@ -116,24 +122,48 @@ public class CtcMetrics implements Metrics {
     .setQualitative(false)
     .create();
 
-  private static final List<Metric> METRICS;
-  static {
-    METRICS = new ArrayList<Metric>(9);
-    for (Field field : CtcMetrics.class.getFields()) {
-      if (Metric.class.isAssignableFrom(field.getType())) {
-        try {
-          Metric metric = (Metric) field.get(null);
-          METRICS.add(metric);
-        } catch (IllegalAccessException e) {
-          throw new RuntimeException("can not introspect " + CtcMetrics.class + " to get metrics", e);
-        }
-      }
-    }
-  }
+
+
+  public static final List<Metric> FILE_METRICS = new ListBuilder()
+    .add(CTC_CONDITIONS_TO_COVER,CTC_CONDITIONS_BY_LINE,CTC_COVERED_CONDITIONS_BY_LINE,CTC_UNCOVERED_CONDITIONS)
+    .add(CTC_STATEMENT_COVERAGE,CTC_UNCOVERED_STATEMENTS)
+    .build();
+  public static final List<Metric> PROJECT_METRICS = new ListBuilder()
+    .add(CTC_MEASURE_POINTS)
+    .build();
+  public static final List<Metric> RELATIVE_METRICS = new ListBuilder()
+    .add(CTC_CONDITION_COVERAGE,CTC_STATEMENT_COVERAGE)
+    .build();
+  public static final List<Metric> METRICS = new ListBuilder()
+    .add(FILE_METRICS).add(PROJECT_METRICS).add(RELATIVE_METRICS).build();
 
   @Override
   public List<Metric> getMetrics() {
     return METRICS;
   }
 
+  private static class ListBuilder {
+
+    private LinkedHashSet<Metric> elements;
+
+    private ListBuilder() {
+      elements = new LinkedHashSet<Metric>();
+    }
+
+    private ListBuilder add(Collection<Metric> metrics) {
+      elements.addAll(metrics);
+      return this;
+    }
+
+    private ListBuilder add(Metric ... metrics) {
+      for (Metric metric : metrics) {
+        elements.add(metric);
+      }
+      return this;
+    }
+
+    private List<Metric> build() {
+      return new ArrayList<Metric>(elements);
+    }
+  }
 }

@@ -12,7 +12,7 @@ License notice: This is a limited period evaluation copy license.
 
 Symbol file(s) used   : MON.sym (Mon Aug 11 12:04:57 2014)
   bla1 awefja waelfnwajlgb
-  bla2 kawjfbawf waifnaw
+      bla2 kawjfbawf waifnaw
   bla3 fawfaowf uwebfawuo
 Data file(s) used     : MON.dat (Mon Aug 11 12:05:14 2014)
  bkrag warguß ß05ig

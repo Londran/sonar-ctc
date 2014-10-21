@@ -1,18 +1,31 @@
 package org.sonar.plugins.ctc.api.parser;
 
-import org.sonar.plugins.ctc.api.parser.CtcTextParser;
+import org.fest.assertions.Assertions;
 
+import org.fest.assertions.Assert;
+import org.jfree.util.Log;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.sonar.plugins.ctc.api.parser.CtcTextParser;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.fest.assertions.Fail.fail;
+import static org.fest.assertions.Assert.*;
 
 public abstract class CtcTextParserTest {
 
   private CtcTextParser testee;
+  private static Logger log = LoggerFactory.getLogger(CtcTextParserTest.class);
+
 
   @Before
   public void setUp() throws Exception {
@@ -25,7 +38,13 @@ public abstract class CtcTextParserTest {
 
   @Test
   public void testHasNext() {
-    fail("Not yet implemented");
+    try {
+      while (testee.next() != null);
+      fail("No Such Element not thrown!");
+    } catch (NoSuchElementException e) {
+      Assertions.assertThat(testee.hasNext()).isEqualTo(false);
+    }
+
   }
 
   @Test
@@ -33,6 +52,7 @@ public abstract class CtcTextParserTest {
     while (testee.hasNext()) {
       testee.next();
     }
+
   }
 
   @Test
@@ -47,7 +67,29 @@ public abstract class CtcTextParserTest {
 
   @Test
   public void testGetReportDetails() {
-    fail("Not yet implemented");
+    while (testee.hasNext()) {
+      log.info("FOUND ELEMENT: {}",testee.next());
+    }
+  }
+
+  private String valueGroup() {
+    return "(.*$(?:\\s+^ +.*$)*)";
+  }
+
+
+
+
+  private String loggedNext(Scanner scanner) {
+    String toReturn = scanner.next();
+    log.info("Next: '{}'",toReturn);
+    return toReturn;
+  }
+
+  private void dissect(Matcher matcher) {
+    log.info("Matcher: {}",matcher);
+    for (int i = 1; i <= matcher.groupCount(); i++) {
+      log.info("Group {}: {}",i, matcher.group(i));
+    }
   }
 
   public abstract File getReport();

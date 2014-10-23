@@ -26,7 +26,6 @@ import org.sonar.plugins.ctc.api.parser.CtcTextParser;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.Map;

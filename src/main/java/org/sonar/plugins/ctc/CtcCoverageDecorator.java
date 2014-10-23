@@ -19,25 +19,52 @@
  */
 package org.sonar.plugins.ctc;
 
+import org.sonar.api.config.Settings;
+import org.sonar.api.measures.Metric;
 import org.sonar.api.batch.CoverageExtension;
-
 import org.sonar.api.batch.DecoratorContext;
 import org.sonar.api.resources.Project;
 import org.sonar.api.resources.Resource;
 import org.sonar.api.batch.Decorator;
 
-public class CtcDecorator implements Decorator, CoverageExtension {
+public abstract class CtcCoverageDecorator implements Decorator, CoverageExtension {
+
+  protected final Settings settings;
+
+  public CtcCoverageDecorator(Settings settings) {
+    this.settings =  settings;
+  }
 
   @Override
   public boolean shouldExecuteOnProject(Project project) {
-    // TODO Auto-generated method stub
-    return false;
+
+    return !settings.getBoolean(CtcPlugin.CTC_DISABLE_DECORATOR_KEY);
   }
 
   @Override
   public void decorate(Resource resource, DecoratorContext context) {
-    // TODO Auto-generated method stub
-
+    computeMeasure(context);
   }
+
+  private void computeMeasure(DecoratorContext context) {
+    if (context.getMeasure(getGeneratedMetric()) == null) {
+      Integer elements = countElements(context);
+      if (elements != null && elements > 0L) {
+        Integer uncoveredElements = countUncoveredElements(context);
+        context.saveMeasure(getGeneratedMetric(), calculateCoverage(uncoveredElements, elements));
+      }
+    }
+  }
+
+  private double calculateCoverage(final long uncoveredLines, final long lines) {
+    return 100.0 - ((100.0*uncoveredLines) / lines);
+  }
+
+  @SuppressWarnings("rawtypes")
+  protected abstract Metric getGeneratedMetric();
+
+  protected abstract Integer countElements(DecoratorContext context);
+
+  protected abstract Integer countUncoveredElements(DecoratorContext context);
 
 }

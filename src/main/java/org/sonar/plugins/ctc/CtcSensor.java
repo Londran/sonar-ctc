@@ -19,23 +19,71 @@
  */
 package org.sonar.plugins.ctc;
 
+import org.apache.commons.lang.NotImplementedException;
+import org.sonar.api.resources.Resource;
+import org.sonar.api.measures.Measure;
+import org.sonar.api.resources.File;
+import org.sonar.plugins.ctc.api.measures.CtcMeasure;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.sonar.plugins.ctc.api.measures.CtcTextReport;
+import org.sonar.plugins.ctc.api.measures.CtcReport;
+import org.sonar.api.config.Settings;
 import org.sonar.api.batch.SensorContext;
 import org.sonar.api.resources.Project;
-
 import org.sonar.api.batch.Sensor;
 
+@SuppressWarnings("rawtypes")
 public class CtcSensor implements Sensor {
+
+  private Logger log = LoggerFactory.getLogger(CtcSensor.class);
+
+  private Settings settings;
+
+  public CtcSensor(Settings settings) {
+    this.settings = settings;
+  }
 
   @Override
   public boolean shouldExecuteOnProject(Project project) {
-    // TODO Auto-generated method stub
-    return false;
+
+    return !settings.getBoolean(CtcPlugin.CTC_DISABLE_SENSOR_KEY);
   }
 
   @Override
   public void analyse(Project module, SensorContext context) {
-    // TODO Auto-generated method stub
+    java.io.File file = new java.io.File(settings.getString(CtcPlugin.CTC_REPORT_PATH_KEY));
+    if (file.canRead()) {
+      log.debug("Using report file {}",file.toString());
+      CtcReport report = new CtcTextReport(file);
+      parseReport(report,module,context);
+    } else {
+      log.error("Could not read report!");
+    }
 
+  }
+
+  private void parseReport(CtcReport report, Project module, SensorContext context) {
+    for (CtcMeasure measure : report) {
+
+      Resource resource = module;
+      if (measure.SOURCE != null) {
+        resource = File.fromIOFile(measure.SOURCE, module);
+      }
+
+      log.debug("Saving measures to: {}",resource.toString());
+      for (Measure rawMeasure : measure.MEASURES) {
+        context.saveMeasure(resource, rawMeasure);
+      }
+
+
+    }
+  }
+
+  @SuppressWarnings("unused")
+  private void saveToCore(Project module, SensorContext context) {
+    //TODO not implemented yet
+    throw new NotImplementedException(this.getClass());
   }
 
 }

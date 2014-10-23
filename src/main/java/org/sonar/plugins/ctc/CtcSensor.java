@@ -19,7 +19,12 @@
  */
 package org.sonar.plugins.ctc;
 
-import org.apache.commons.lang.NotImplementedException;
+import org.sonar.api.measures.Metric.ValueType;
+import org.sonar.api.measures.Metric;
+
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.sonar.api.resources.Resource;
 import org.sonar.api.measures.Measure;
 import org.sonar.api.resources.File;
@@ -81,9 +86,33 @@ public class CtcSensor implements Sensor {
   }
 
   @SuppressWarnings("unused")
-  private void saveToCore(Project module, SensorContext context) {
-    //TODO not implemented yet
-    throw new NotImplementedException(this.getClass());
+  private void saveToCore(Resource resource, SensorContext context, Map<Metric, Metric> coreMap) {
+    for (Resource child : context.getChildren(resource)) {
+      saveToCore(resource,context,coreMap);
+    }
+    for (Entry<Metric, Metric> entry : coreMap.entrySet()) {
+      @SuppressWarnings("unchecked")
+      Measure measure = context.getMeasure(resource, entry.getKey());
+      if (measure != null) {
+        switch (entry.getKey().getType()) {
+          case INT:
+            context.saveMeasure(resource, entry.getValue(), measure.getValue());
+            break;
+          case DATA:
+            Measure m2 = new Measure(entry.getValue(), measure.getData());
+            context.saveMeasure(resource,m2);
+            break;
+          case FLOAT:
+          case PERCENT:
+            context.saveMeasure(resource, entry.getValue(), measure.getValue());
+            break;
+          default:
+            log.debug("Unknown Datatype! {}",measure);
+            break;
+
+        }
+      }
+    }
   }
 
 }

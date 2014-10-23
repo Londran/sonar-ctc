@@ -19,12 +19,10 @@
  */
 package org.sonar.plugins.ctc;
 
-import org.sonar.api.measures.Metric.ValueType;
 import org.sonar.api.measures.Metric;
 
 import java.util.Map;
 import java.util.Map.Entry;
-
 import org.sonar.api.resources.Resource;
 import org.sonar.api.measures.Measure;
 import org.sonar.api.resources.File;
@@ -114,5 +112,4 @@ public class CtcSensor implements Sensor {
       }
     }
   }
-
 }

@@ -1,25 +1,16 @@
 package org.sonar.plugins.ctc.api.parser;
 
 import org.fest.assertions.Assertions;
-
-import org.fest.assertions.Assert;
-import org.jfree.util.Log;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.sonar.plugins.ctc.api.parser.CtcTextParser;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.NoSuchElementException;
-import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static org.fest.assertions.Fail.fail;
-import static org.fest.assertions.Assert.*;
 
 public abstract class CtcTextParserTest {
 
@@ -69,26 +60,6 @@ public abstract class CtcTextParserTest {
   public void testGetReportDetails() {
     while (testee.hasNext()) {
       log.info("FOUND ELEMENT: {}",testee.next());
-    }
-  }
-
-  private String valueGroup() {
-    return "(.*$(?:\\s+^ +.*$)*)";
-  }
-
-
-
-
-  private String loggedNext(Scanner scanner) {
-    String toReturn = scanner.next();
-    log.info("Next: '{}'",toReturn);
-    return toReturn;
-  }
-
-  private void dissect(Matcher matcher) {
-    log.info("Matcher: {}",matcher);
-    for (int i = 1; i <= matcher.groupCount(); i++) {
-      log.info("Group {}: {}",i, matcher.group(i));
     }
   }
 

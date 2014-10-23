@@ -80,7 +80,7 @@ public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcPa
     if (!matcher.reset(scanner.next()).find()) {
       throw new CtcInvalidReportException("File Header not found!");
     }
-    state = state.PARSING;
+    state = State.PARSING;
     return parseUnit();
   }
 

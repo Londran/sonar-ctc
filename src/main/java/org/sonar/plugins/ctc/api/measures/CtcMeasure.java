@@ -20,6 +20,10 @@
 package org.sonar.plugins.ctc.api.measures;
 
 import com.google.common.collect.Maps;
+
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonar.api.measures.Measure;
 import org.sonar.api.measures.Metric;
 import org.sonar.api.measures.PersistenceMode;
@@ -35,11 +39,23 @@ import java.util.SortedMap;
 
 @SuppressWarnings("rawtypes")
 public class CtcMeasure {
+	
+	static Logger log = LoggerFactory.getLogger(CtcMeasure.class);
 
 
   private CtcMeasure(final File SOURCE, final Collection<Measure>  collection) {
     this.SOURCE = SOURCE;
     this.MEASURES = collection;
+    if (SOURCE != null && !SOURCE.exists()) {
+    	log.error("File {} does not exist!", SOURCE);
+    	
+    }
+    if (SOURCE != null) {
+    	log.debug("AbsoluteFilePath of {} : {}",SOURCE,SOURCE.getAbsolutePath());
+    } else {
+    	log.debug("PROJECTMEASURE");
+    }
+    
   }
 
   public final File SOURCE;
@@ -142,6 +158,10 @@ public class CtcMeasure {
     }
 
     public static FileMeasureBuilder create(File file) {
+      if (!file.exists()) {
+        log.error("File {} not found!",file);
+      }
+      log.debug("Absolute Filepath: '{}'",file.getAbsolutePath());
       return new FileMeasureBuilder(file);
     }
   }

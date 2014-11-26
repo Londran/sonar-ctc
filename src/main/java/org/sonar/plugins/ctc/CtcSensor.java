@@ -19,8 +19,11 @@
  */
 package org.sonar.plugins.ctc;
 
+import org.apache.commons.collections.map.HashedMap;
+import org.sonar.api.measures.CoreMetrics;
 import org.sonar.api.measures.Metric;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import org.sonar.api.resources.Resource;
@@ -29,6 +32,7 @@ import org.sonar.api.resources.File;
 import org.sonar.plugins.ctc.api.measures.CtcMeasure;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.sonar.plugins.ctc.api.measures.CtcMetrics;
 import org.sonar.plugins.ctc.api.measures.CtcTextReport;
 import org.sonar.plugins.ctc.api.measures.CtcReport;
 import org.sonar.api.config.Settings;
@@ -46,6 +50,14 @@ public class CtcSensor implements Sensor {
   public CtcSensor(Settings settings) {
     this.settings = settings;
   }
+  
+  public static Map<Metric, Metric> translator;
+  
+  static {
+	  translator = new HashMap<Metric, Metric>();
+	  translator.put(CtcMetrics.CTC_CONDITIONS_TO_COVER, CoreMetrics.CONDITIONS_TO_COVER);
+	  translator.put(CtcMetrics.CTC_STATEMENTS_TO_COVER, CoreMetrics.STATEMENTS);
+  }
 
   @Override
   public boolean shouldExecuteOnProject(Project project) {
@@ -55,6 +67,7 @@ public class CtcSensor implements Sensor {
 
   @Override
   public void analyse(Project module, SensorContext context) {
+	  log.debug("Module: '{}' Module.getParent(): {} getBranch(): '{}' getModules(): '{}' getRoot(): '{}'",module, module.getParent(),module.getBranch(),module.getModules(),module.getRoot());
     java.io.File file = new java.io.File(settings.getString(CtcPlugin.CTC_REPORT_PATH_KEY));
     if (file.canRead()) {
       log.debug("Using report file {}",file.toString());
@@ -68,15 +81,32 @@ public class CtcSensor implements Sensor {
 
   private void parseReport(CtcReport report, Project module, SensorContext context) {
     for (CtcMeasure measure : report) {
-
+      java.io.File file = measure.SOURCE;
+      if (file != null && !file.exists()) {
+    	  log.error("File not found {}", file);
+    	  break;
+      }
+      if (measure.SOURCE != null) log.debug("Absolute Filepath: {}",measure.SOURCE.getAbsolutePath());
       Resource resource = module;
       if (measure.SOURCE != null) {
+    	log.debug("FileName: {}",measure.SOURCE);
         resource = File.fromIOFile(measure.SOURCE, module);
+        resource = context.getResource(resource); 
+        if (resource == null) {
+        	log.error("File not mapped to resource!");
+        	continue;
+        }
       }
 
-      log.debug("Saving measures to: {}",resource.toString());
+      log.debug("Saving measures to: {}",resource);
       for (Measure rawMeasure : measure.MEASURES) {
+    	log.debug("Resource: {} Measure: {}",resource,rawMeasure);
         context.saveMeasure(resource, rawMeasure);
+        
+      }
+      
+      if (settings.getBoolean(CtcPlugin.CTC_CORE_METRIC_KEY)) {
+    	  
       }
 
 

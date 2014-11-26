@@ -99,7 +99,7 @@ public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcPa
   }
 
   private CtcMeasure parseFileUnit() {
-    File file = new File(matcher.group(1));
+    File file = new File("./" + matcher.group(1));
     CtcMeasure.FileMeasureBuilder bob = FileMeasureBuilder.create(file);
     try {
       addLines(bob);

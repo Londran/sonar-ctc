@@ -50,14 +50,6 @@ public class CtcSensor implements Sensor {
   public CtcSensor(Settings settings) {
     this.settings = settings;
   }
-  
-  public static Map<Metric, Metric> translator;
-  
-  static {
-	  translator = new HashMap<Metric, Metric>();
-	  translator.put(CtcMetrics.CTC_CONDITIONS_TO_COVER, CoreMetrics.CONDITIONS_TO_COVER);
-	  translator.put(CtcMetrics.CTC_STATEMENTS_TO_COVER, CoreMetrics.STATEMENTS);
-  }
 
   @Override
   public boolean shouldExecuteOnProject(Project project) {

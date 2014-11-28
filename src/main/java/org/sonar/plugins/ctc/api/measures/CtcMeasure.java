@@ -24,6 +24,7 @@ import com.google.common.collect.Maps;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonar.api.measures.CoreMetrics;
 import org.sonar.api.measures.Measure;
 import org.sonar.api.measures.Metric;
 import org.sonar.api.measures.PersistenceMode;
@@ -66,9 +67,10 @@ public class CtcMeasure {
     public static final List<Metric> METRICS = CtcMetrics.FILE_METRICS;
 
 
-    private int totalStatements = 0, totalCoveredStatements = 0, totalConditions = 0, totalCoveredConditions = 0;
+    private int totalCoveredLines = 0,totalStatements = 0, totalCoveredStatements = 0, totalConditions = 0, totalCoveredConditions = 0;
     private SortedMap<Integer, Integer> conditionsByLine = Maps.newTreeMap();
     private SortedMap<Integer, Integer> coveredConditionsByLine = Maps.newTreeMap();
+    private SortedMap<Integer, Integer> hitsByLine = Maps.newTreeMap();
 
     public final File FILE;
 
@@ -81,6 +83,7 @@ public class CtcMeasure {
       totalCoveredStatements = 0;
       totalConditions = 0;
       totalCoveredConditions = 0;
+      totalCoveredLines = 0;
       conditionsByLine.clear();
       coveredConditionsByLine.clear();
       return this;
@@ -91,6 +94,16 @@ public class CtcMeasure {
       totalCoveredStatements = covered;
       return this;
     }
+    
+    public FileMeasureBuilder setHits(int lineId, int hits) {
+        if (!hitsByLine.containsKey(lineId)) {
+          hitsByLine.put(lineId, hits);
+          if (hits > 0) {
+            totalCoveredLines += 1;
+          }
+        }
+        return this;
+      }
 
     public FileMeasureBuilder setConditions(int lineId, int conditions, int coveredConditions) {
       if (conditions > 0 && !conditionsByLine.containsKey(lineId)) {
@@ -100,6 +113,18 @@ public class CtcMeasure {
         coveredConditionsByLine.put(lineId, coveredConditions);
       }
       return this;
+    }
+    
+    public int getCoveredLines() {
+      return totalCoveredLines;
+    }
+
+    public int getLinesToCover() {
+      return hitsByLine.size();
+    }
+    
+    public SortedMap<Integer, Integer> getHitsByLine() {
+      return Collections.unmodifiableSortedMap(hitsByLine);
     }
 
     public int getCoveredStatements() {
@@ -128,10 +153,15 @@ public class CtcMeasure {
 
     public Collection<Measure> createMeasures() {
       Collection<Measure> measures = new ArrayList<Measure>();
+      if (getLinesToCover() > 0) {
+        measures.add(new Measure(CtcMetrics.CTC_LINES_TO_COVER, (double) getLinesToCover()));
+        measures.add(new Measure(CtcMetrics.CTC_UNCOVERED_LINES, (double) (getLinesToCover() - getCoveredLines())));
+        measures.add(new Measure(CtcMetrics.CTC_COVERAGE_LINE_HITS_DATA).setData(KeyValueFormat.format(hitsByLine)).setPersistenceMode(PersistenceMode.DATABASE));
+      }
       if (getStatements() > 0) {
         measures.add(new Measure(CtcMetrics.CTC_STATEMENTS_TO_COVER, (double) getStatements()));
         measures.add(new Measure(CtcMetrics.CTC_UNCOVERED_STATEMENTS, (double) (getStatements() - getCoveredStatements())));
-        }
+      }
       if (getConditions() > 0) {
         measures.add(new Measure(CtcMetrics.CTC_CONDITIONS_TO_COVER, (double) getConditions()));
         measures.add(new Measure(CtcMetrics.CTC_UNCOVERED_CONDITIONS, (double) (getConditions() - getCoveredConditions())));

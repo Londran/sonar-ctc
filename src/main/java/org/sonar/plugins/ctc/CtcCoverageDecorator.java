@@ -43,11 +43,6 @@ public abstract class CtcCoverageDecorator implements Decorator, CoverageExtensi
     this.settings =  settings;
   }
 
-
-  @DependsUpon
-  public Collection<Metric> generatedMetrics() {
-	    return Arrays.asList(getGeneratedMetric());
-	  }
   
   @Override
   public boolean shouldExecuteOnProject(Project project) {

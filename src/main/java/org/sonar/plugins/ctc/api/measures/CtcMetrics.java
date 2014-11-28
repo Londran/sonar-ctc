@@ -44,10 +44,9 @@ public class CtcMetrics implements Metrics {
   public static final Metric<Integer> CTC_STATEMENTS_TO_COVER = new Builder(CTC_STATEMENTS_TO_COVER_KEY, "CTC++ statements to cover", INT)
     .setDescription("Overall statements to cover by all tests")
     .setDirection(Metric.DIRECTION_NONE)
-    .setDomain(DOMAIN_OVERALL_TESTS)
+    .setDomain(DOMAIN_CTC_TEST)
     .setQualitative(false)
     .setFormula(new SumChildValuesFormula(false))
-    .setHidden(true)
     .setDeleteHistoricalData(true)
     .create();
 
@@ -62,7 +61,7 @@ public class CtcMetrics implements Metrics {
 
   public static final String CTC_STATEMENT_COVERAGE_KEY = "ctc_statement_coverage";
   public static final Metric<Double> CTC_STATEMENT_COVERAGE = new Builder(CTC_STATEMENT_COVERAGE_KEY, "CTC++ statement coverage", PERCENT)
-    .setDescription("Statement coverage by all tests")
+    .setDescription("CTC++ Statement coverage by all tests")
     .setDirection(Metric.DIRECTION_BETTER)
     .setQualitative(true)
     .setDomain(DOMAIN_CTC_TEST)
@@ -102,7 +101,7 @@ public class CtcMetrics implements Metrics {
     .create();
 
   public static final String CTC_CONDITION_COVERAGE_KEY = "ctc_condition_coverage";
-  public static final Metric<Double> CTC_CONDITION_COVERAGE = new Metric.Builder(CTC_CONDITION_COVERAGE_KEY, "CTC++ condition coverage by CTC++", PERCENT)
+  public static final Metric<Double> CTC_CONDITION_COVERAGE = new Metric.Builder(CTC_CONDITION_COVERAGE_KEY, "CTC++ condition coverage", PERCENT)
     .setDescription("Condition coverage by all tests")
     .setDirection(Metric.DIRECTION_BETTER)
     .setQualitative(true)
@@ -110,6 +109,44 @@ public class CtcMetrics implements Metrics {
     .setWorstValue(0.0)
     .setBestValue(100.0)
     .create();
+  
+  // LineCoverage
+  
+  public static final String CTC_LINES_TO_COVER_KEY = "ctc_lines_to_cover";
+  public static final Metric<Integer> CTC_LINES_TO_COVER = new Metric.Builder(CTC_LINES_TO_COVER_KEY, "Lines to cover", Metric.ValueType.INT)
+    .setDescription("Lines to cover")
+    .setDirection(Metric.DIRECTION_BETTER)
+    .setQualitative(false)
+    .setDomain(DOMAIN_CTC_TEST)
+    .setFormula(new SumChildValuesFormula(false))
+    .create();
+
+  public static final String CTC_UNCOVERED_LINES_KEY = "ctc_uncovered_lines";
+  public static final Metric<Integer> CTC_UNCOVERED_LINES = new Metric.Builder(CTC_UNCOVERED_LINES_KEY, "CTC++ Uncovered lines", Metric.ValueType.INT)
+    .setDescription("Uncovered lines")
+    .setDirection(Metric.DIRECTION_WORST)
+    .setDomain(DOMAIN_CTC_TEST)
+    .setFormula(new SumChildValuesFormula(false))
+    .setBestValue(0.0)
+    .create();
+
+  public static final String CTC_LINE_COVERAGE_KEY = "ctc_line_coverage";
+  public static final Metric<Double> CTC_LINE_COVERAGE = new Metric.Builder(CTC_LINE_COVERAGE_KEY, "CTC++ Line coverage", Metric.ValueType.PERCENT)
+    .setDescription("Line coverage")
+    .setDirection(Metric.DIRECTION_BETTER)
+    .setQualitative(true)
+    .setDomain(DOMAIN_CTC_TEST)
+    .setWorstValue(0.0)
+    .setBestValue(100.0)
+    .create();
+
+  public static final String CTC_COVERAGE_LINE_HITS_DATA_KEY = "ctc_coverage_line_hits_data";
+  public static final Metric<String> CTC_COVERAGE_LINE_HITS_DATA = new Metric.Builder(CTC_COVERAGE_LINE_HITS_DATA_KEY, "CTC++ Coverage hits by line", Metric.ValueType.DATA)
+    .setDomain(DOMAIN_CTC_TEST)
+    .setDeleteHistoricalData(true)
+    .create();
+
+
 
   public static final String CTC_MEASURE_POINTS_KEY = "ctc_measure_points";
   public static final Metric<Integer> CTC_MEASURE_POINTS = new Builder(CTC_MEASURE_POINTS_KEY, "CTC++ used measurement points", INT)
@@ -124,12 +161,14 @@ public class CtcMetrics implements Metrics {
   public static final List<Metric> FILE_METRICS = new ListBuilder()
     .add(CTC_CONDITIONS_TO_COVER,CTC_CONDITIONS_BY_LINE,CTC_COVERED_CONDITIONS_BY_LINE,CTC_UNCOVERED_CONDITIONS)
     .add(CTC_STATEMENTS_TO_COVER,CTC_STATEMENT_COVERAGE,CTC_UNCOVERED_STATEMENTS)
+    .add(CTC_LINES_TO_COVER,CTC_COVERAGE_LINE_HITS_DATA)
     .build();
   public static final List<Metric> PROJECT_METRICS = new ListBuilder()
     .add(CTC_MEASURE_POINTS)
     .build();
   public static final List<Metric> RELATIVE_METRICS = new ListBuilder()
     .add(CTC_CONDITION_COVERAGE,CTC_STATEMENT_COVERAGE)
+    .add(CTC_LINE_COVERAGE)
     .build();
   public static final List<Metric> METRICS = new ListBuilder()
     .add(FILE_METRICS).add(PROJECT_METRICS).add(RELATIVE_METRICS).build();

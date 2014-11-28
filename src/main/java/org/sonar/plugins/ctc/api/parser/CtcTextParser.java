@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
+import java.util.TreeMap;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 
@@ -113,12 +114,16 @@ public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcPa
 
   private void addLines(CtcMeasure.FileMeasureBuilder bob) throws NoSuchElementException {
     log.debug("Adding lines...");
-    Map<Integer,HashSet<MatchResult>> buffer = new HashMap<Integer, HashSet<MatchResult>>();
+    Map<Integer,HashSet<MatchResult>> buffer = new TreeMap<Integer, HashSet<MatchResult>>();
     while (!matcher.reset(scanner.next()).usePattern(FILE_RESULT).find()) {
       log.debug("Found linesection...");
       if (matcher.usePattern(LINE_RESULT).find(0)) {
+    	int start = Integer.parseInt(matcher.group(3));
+    	int last;
+    	log.debug("Function start: {}", start);
         do {
-          HashSet<MatchResult> line = buffer.get(Integer.parseInt(matcher.group(3)));
+          last = Integer.parseInt(matcher.group(3));
+          HashSet<MatchResult> line = buffer.get(last);
           if (line == null) {
             line = new HashSet<MatchResult>();
             buffer.put(Integer.parseInt(matcher.group(3)), line);
@@ -126,6 +131,8 @@ public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcPa
           log.debug("Added line: {}",matcher.toMatchResult());
           line.add(matcher.toMatchResult());
         } while (matcher.find());
+        log.debug("Function end: {}", last);
+        
       } else {
         log.error("Neither File Result nor Line Result after FileHeader!");
         log.debug("Matcher: {}",matcher);
@@ -133,7 +140,7 @@ public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcPa
       }
     }
     log.debug("Found matches: {}",buffer);
-
+    Entry<Integer,HashSet<MatchResult>> prev = null;
     for (Entry<Integer,HashSet<MatchResult>> line : buffer.entrySet()) {
       int lineId = line.getKey();
       log.debug("LineId: {}",lineId);
@@ -150,6 +157,15 @@ public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcPa
             }
           }
         }
+        
+        if (prev != null) {
+        	if (conditions == 0)
+        	for (int i = prev.getKey(); i < line.getKey(); i++) {
+        		bob.setHits(i, coveredConditions);
+        	}
+        }
+        prev = line;
+        
       }
       log.trace("Conditioncoverage: {}/{}",coveredConditions,conditions);
       bob.setConditions(lineId, conditions, coveredConditions);

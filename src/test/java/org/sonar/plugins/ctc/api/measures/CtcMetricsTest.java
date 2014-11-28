@@ -42,7 +42,7 @@ public class CtcMetricsTest {
     LOG.info("Starting Metrics test.");
     LOG.debug("Metrics: {}",testee.getMetrics());
     assertThat(testee.getMetrics()).doesNotHaveDuplicates()
-    .hasSize(9);
+    .hasSize(12);
   }
 
 }

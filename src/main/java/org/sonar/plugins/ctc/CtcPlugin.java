@@ -40,7 +40,7 @@ public class CtcPlugin extends SonarPlugin {
   public static final List EXTENSIONS = Arrays.asList(
 
     CtcMetrics.class,
-    CtcSensor.class, CtcConditionCoverageDecorator.class, CtcStatementCoverageDecorator.class,
+    CtcSensor.class, CtcConditionCoverageDecorator.class, CtcStatementCoverageDecorator.class, CtcCoreMetricDecorator.class,
     PropertyDefinition.builder(CTC_REPORT_PATH_KEY)
       .hidden().defaultValue("report.txt").type(PropertyType.STRING).name("CTC_REPORT_PATH").build(),
     PropertyDefinition.builder(CTC_REPORT_TYPE_KEY)

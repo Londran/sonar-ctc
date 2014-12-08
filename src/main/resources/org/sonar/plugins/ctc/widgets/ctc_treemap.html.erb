@@ -1,0 +1,187 @@
+<%
+   containerId = 'project-file-widget' + widget.id.to_s
+   colorMetric = widget_properties['colorMetric']
+   sizeMetric = widget_properties['sizeMetric']
+   reportMetric = Metric.by_key('ctc_orig_report_name')
+   chartTitle = widget_properties['chartTitle']
+   maxItems = widget_properties['maxItems'].to_i
+%>
+
+<div class="ctc-treemap-widget" id="<%= containerId %>">
+  <!--[if lte IE 8 ]> <h3><%= message('widget.unsupported_browser_warning') -%></h3> <![endif]-->
+
+  <!--[if (gte IE 9)|!(IE)]><!-->
+  <% if chartTitle %>
+    <h3 style="margin-bottom: 5px;"><%= h(chartTitle) -%></h3>
+  <% end %>
+  <!--<![endif]-->
+</div>
+
+<!--[if (gte IE 9)|!(IE)]><!-->
+<script>
+  (function () {
+    <%
+      filter = MeasureFilter.new
+      filter.set_criteria_value(:base, @resource.key)
+      filter.set_criteria_value(:onBaseComponents, 'true')
+      filter.set_criteria_value(:pageSize, 100)
+      filter.set_criteria_value(:page, 1)
+      filter.metrics=([sizeMetric, colorMetric, reportMetric].compact)
+      filter.execute(self, :user => current_user)
+      debug filter.rows
+    %>
+
+    var data = {
+      metrics: {
+        <%= colorMetric.name -%>: {
+          name: '<%= colorMetric.short_name -%>',
+          direction: <%= colorMetric.direction -%>,
+          type: '<%= colorMetric.val_type -%>'
+        },
+        <%= sizeMetric.name -%>: {
+          name: '<%= sizeMetric.short_name -%>'
+        },
+        <%= reportMetric.name -%>: {
+          name: '<%= reportMetric.short_name -%>'
+        }
+        
+      },
+      components: [
+        <%
+        filter.rows.each  do |row|
+          color = row.measure(colorMetric)
+          size = row.measure(sizeMetric)
+          path = row.measure(reportMetric)
+        %>
+          {
+            key: '<%= escape_javascript row.resource.key -%>',
+            name: '<%= escape_javascript row.resource.name -%>',
+            longName: '<%= escape_javascript row.resource.long_name -%>',
+            qualifier: '<%= escape_javascript row.resource.qualifier -%>',
+            measures: {
+              <%= colorMetric.name -%>: { val: <%= color ? color.value : "null" -%>, fval: '<%= color ? color.formatted_value : "-" -%>' },
+              <%= sizeMetric.name -%>: { val: <%= size ? size.value : "null" -%>, fval: '<%= size ? size.formatted_value : "-" -%>' },
+              <%= reportMetric.name -%>: { data: '<%= path ? path.text_value : "index.html" -%>' }
+            }
+          },
+        <% end %>
+      ]
+    },
+    widget = new SonarWidgets.Treemap();
+    
+    widget.formatComponents = function(data) {
+      var components;
+      components = _.filter(data, (function(_this) {
+        return function(component) {
+          var hasSizeMetric;
+          hasSizeMetric = function() {
+            return _.findWhere(component.msr, {
+              key: _this.sizeMetric.key
+            });
+          };
+          return _.isArray(component.msr) && component.msr.length > 0 && hasSizeMetric();
+        };
+      })(this));
+      if (_.isArray(components) && components.length > 0) {
+        return components.map((function(_this) {
+          return function(component) {
+            var measures;
+            measures = {};
+            component.msr.forEach(function(measure) {
+              return measures[measure.key] = {
+                val: measure.val,
+                fval: measure.frmt_val,
+                data: measure.data
+              };
+            });
+            return {
+              key: component.copy != null ? component.copy : component.key,
+              name: component.name,
+              longName: component.lname,
+              qualifier: component.qualifier,
+              measures: measures
+            };
+          };
+        })(this));
+      }
+    };
+    
+	widget.renderTreemap = function() {
+      var cellsEnter, nodes, prefix, prefixLength;
+      nodes = this.getNodes();
+      this.cells = this.box.selectAll('.treemap-cell').data(nodes);
+      this.cells.exit().remove();
+      cellsEnter = this.cells.enter().append('div');
+      cellsEnter.classed('treemap-cell', true);
+      cellsEnter.append('div').classed('treemap-inner', true);
+      cellsEnter.append('a').classed('treemap-link', true);
+      this.cells.attr('title', (function(_this) {
+        return function(d) {
+          return _this.tooltip(d);
+        };
+      })(this));
+      this.cells.style('background-color', (function(_this) {
+        return function(d) {
+          if (_this.colorMetric.value(d) != null) {
+            return _this.color(_this.colorMetric.value(d));
+          } else {
+            return _this.colorUnknown;
+          }
+        };
+      })(this));
+      this.cells.classed('treemap-cell-drilldown', function(d) {
+        return (d.qualifier != null) && d.qualifier !== 'FIL' && d.qualifier !== 'CLA';
+      });
+      prefix = this.mostCommonPrefix(_.pluck(this.components(), 'longName'));
+      prefixLength = prefix.length;
+      this.cellsInner = this.box.selectAll('.treemap-inner').data(nodes);
+      this.cellsInner.html(function(d) {
+        if (prefixLength > 0) {
+          return "" + prefix + "<br>" + (d.longName.substr(prefixLength));
+        } else {
+          return d.longName;
+        }
+      });
+      this.cellsLink = this.box.selectAll('.treemap-link').data(nodes);
+      this.cellsLink.html('<i class="icon-link"></i>');
+      this.cellsLink.attr('href', (function(_this) {
+        return function(d) {
+          console.log(d);
+      	  console.log(_this);
+      	  var path = "";
+      	  if (d.measures.<%= reportMetric.name -%> !== 'undefined') {
+      	    path = d.measures.<%= reportMetric.name -%>.data;
+      	  }
+      	  console.log(path)
+          var url = _this.options().baseUrl;
+          
+          
+          return url + path;
+        };
+      })(this));
+      this.attachEvents(cellsEnter);
+      return this.maxResultsReachedLabel.style('display', this.maxResultsReached() ? 'block' : 'none');
+    };
+	
+
+    widget
+      .metrics(data.metrics)
+      .metricsPriority(['<%= colorMetric.name -%>', '<%= sizeMetric.name -%>', '<%= reportMetric.name -%>'])
+      .components(data.components)
+      .options({
+        heightInPercents: '<%= widget_properties['heightInPercents'] -%>',
+        maxItems: <%= maxItems -%>,
+        maxItemsReachedMessage: '<%= message("widget.measure_filter_histogram.max_items_reached", :params => [maxItems]) -%>',
+        baseUrl: '<%= widget_properties['reportBaseUrl'] -%>',
+        noData: '<%= message('no_data') -%>',
+        resource: '<%= @resource.name -%>'
+      })
+      .render('#<%= containerId -%>');
+
+
+    autoResize(500, function() {
+      widget.update('#<%= containerId -%>');
+    });
+  })();
+</script>
+<!--<![endif]-->

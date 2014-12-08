@@ -22,6 +22,7 @@ package org.sonar.plugins.ctc;
 import org.sonar.api.PropertyType;
 import org.sonar.api.config.PropertyDefinition;
 import org.sonar.plugins.ctc.api.measures.CtcMetrics;
+import org.sonar.plugins.ctc.widgets.CtcTreemapWidget;
 
 import java.util.Arrays;
 import java.util.List;
@@ -40,7 +41,8 @@ public class CtcPlugin extends SonarPlugin {
   public static final List EXTENSIONS = Arrays.asList(
 
     CtcMetrics.class,
-    CtcSensor.class, CtcConditionCoverageDecorator.class, CtcStatementCoverageDecorator.class, CtcCoreMetricDecorator.class,
+    CtcTreemapWidget.class,
+    CtcSensor.class, CtcConditionCoverageDecorator.class, CtcStatementCoverageDecorator.class, CtcCoreMetricDecorator.class, CtcHtmlDecorator.class,
     PropertyDefinition.builder(CTC_REPORT_PATH_KEY)
       .hidden().defaultValue("report.txt").type(PropertyType.STRING).name("CTC_REPORT_PATH").build(),
     PropertyDefinition.builder(CTC_REPORT_TYPE_KEY)

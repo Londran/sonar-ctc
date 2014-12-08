@@ -19,20 +19,15 @@
  */
 package org.sonar.plugins.ctc;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonar.api.config.Settings;
-import org.sonar.api.measures.Measure;
-import org.sonar.api.measures.Metric;
 import org.sonar.api.batch.CoverageExtension;
+import org.sonar.api.batch.Decorator;
 import org.sonar.api.batch.DecoratorContext;
-import org.sonar.api.batch.DependsUpon;
+import org.sonar.api.config.Settings;
+import org.sonar.api.measures.Metric;
 import org.sonar.api.resources.Project;
 import org.sonar.api.resources.Resource;
-import org.sonar.api.batch.Decorator;
 
 public abstract class CtcCoverageDecorator implements Decorator, CoverageExtension {
 

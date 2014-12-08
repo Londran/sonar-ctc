@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>sonar-ctc-plugin</artifactId>
   <packaging>sonar-plugin</packaging>
-  <version>0.7.2-BETA</version>
+  <version>0.8.1-BETA</version>
   <name>Testwell CTC++ Plugin</name>
   <description>Reportparser for Testwell CTC++ reports</description>
 
@@ -56,6 +56,11 @@
       <version>1.1.2</version>
       <scope>test</scope>
       <optional>true</optional>
+    </dependency>
+    <dependency>
+    	<groupId>net.htmlparser.jericho</groupId>
+    	<artifactId>jericho-html</artifactId>
+    	<version>3.3</version>
     </dependency>
   </dependencies>
 

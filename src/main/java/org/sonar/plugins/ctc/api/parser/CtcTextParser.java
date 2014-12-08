@@ -19,16 +19,13 @@
  */
 package org.sonar.plugins.ctc.api.parser;
 
-import com.google.common.collect.AbstractIterator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.sonar.plugins.ctc.api.exceptions.CtcInvalidReportException;
-import org.sonar.plugins.ctc.api.measures.CtcMeasure;
-import org.sonar.plugins.ctc.api.measures.CtcMeasure.FileMeasureBuilder;
+import static org.sonar.plugins.ctc.api.parser.CtcResult.FILE_HEADER;
+import static org.sonar.plugins.ctc.api.parser.CtcResult.FILE_RESULT;
+import static org.sonar.plugins.ctc.api.parser.CtcResult.LINE_RESULT;
+import static org.sonar.plugins.ctc.api.parser.CtcResult.SECTION_SEP;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -38,10 +35,13 @@ import java.util.TreeMap;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 
-import static org.sonar.plugins.ctc.api.parser.CtcResult.FILE_HEADER;
-import static org.sonar.plugins.ctc.api.parser.CtcResult.FILE_RESULT;
-import static org.sonar.plugins.ctc.api.parser.CtcResult.LINE_RESULT;
-import static org.sonar.plugins.ctc.api.parser.CtcResult.SECTION_SEP;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.sonar.plugins.ctc.api.exceptions.CtcInvalidReportException;
+import org.sonar.plugins.ctc.api.measures.CtcMeasure;
+import org.sonar.plugins.ctc.api.measures.CtcMeasure.FileMeasureBuilder;
+
+import com.google.common.collect.AbstractIterator;
 
 public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcParser  {
 
@@ -59,7 +59,8 @@ public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcPa
   private final static Logger log = LoggerFactory.getLogger(CtcTextParser.class);
 
 
-  public CtcTextParser(File report) throws FileNotFoundException {
+  @SuppressWarnings("resource")
+public CtcTextParser(File report) throws FileNotFoundException {
     scanner = new Scanner(report).useDelimiter(SECTION_SEP);
     matcher = CtcResult.FILE_HEADER.matcher("");
     state = State.BEGIN;
@@ -91,6 +92,7 @@ public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcPa
     } else if (matcher.usePattern(CtcResult.REPORT_FOOTER).find(0)) {
       parseReportUnit();
       state = State.END;
+      scanner.close();
       return projectBuilder.build();
     } else {
       log.error("Illegal format!");

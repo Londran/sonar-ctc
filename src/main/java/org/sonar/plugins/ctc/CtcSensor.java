@@ -19,26 +19,22 @@
  */
 package org.sonar.plugins.ctc;
 
-import org.apache.commons.collections.map.HashedMap;
-import org.sonar.api.measures.CoreMetrics;
-import org.sonar.api.measures.Metric;
-
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import org.sonar.api.resources.Resource;
-import org.sonar.api.measures.Measure;
-import org.sonar.api.resources.File;
-import org.sonar.plugins.ctc.api.measures.CtcMeasure;
-import org.slf4j.LoggerFactory;
+
 import org.slf4j.Logger;
-import org.sonar.plugins.ctc.api.measures.CtcMetrics;
-import org.sonar.plugins.ctc.api.measures.CtcTextReport;
-import org.sonar.plugins.ctc.api.measures.CtcReport;
-import org.sonar.api.config.Settings;
-import org.sonar.api.batch.SensorContext;
-import org.sonar.api.resources.Project;
+import org.slf4j.LoggerFactory;
 import org.sonar.api.batch.Sensor;
+import org.sonar.api.batch.SensorContext;
+import org.sonar.api.config.Settings;
+import org.sonar.api.measures.Measure;
+import org.sonar.api.measures.Metric;
+import org.sonar.api.resources.File;
+import org.sonar.api.resources.Project;
+import org.sonar.api.resources.Resource;
+import org.sonar.plugins.ctc.api.measures.CtcMeasure;
+import org.sonar.plugins.ctc.api.measures.CtcReport;
+import org.sonar.plugins.ctc.api.measures.CtcTextReport;
 
 @SuppressWarnings("rawtypes")
 public class CtcSensor implements Sensor {

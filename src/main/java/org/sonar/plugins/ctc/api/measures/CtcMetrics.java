@@ -19,8 +19,10 @@
  */
 package org.sonar.plugins.ctc.api.measures;
 
+import org.sonar.api.measures.CoreMetrics;
 import org.sonar.api.measures.Metric;
 import org.sonar.api.measures.Metric.Builder;
+import org.sonar.api.measures.Metric.ValueType;
 import org.sonar.api.measures.Metrics;
 import org.sonar.api.measures.SumChildValuesFormula;
 
@@ -29,7 +31,6 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-import static org.sonar.api.measures.CoreMetrics.DOMAIN_OVERALL_TESTS;
 import static org.sonar.api.measures.Metric.DIRECTION_BETTER;
 import static org.sonar.api.measures.Metric.ValueType.DATA;
 import static org.sonar.api.measures.Metric.ValueType.INT;
@@ -157,11 +158,20 @@ public class CtcMetrics implements Metrics {
     .create();
 
 
+  public static final String CTC_ORIG_REPORT_NAME_KEY = "ctc_orig_report_name";
+  public static final Metric<String> CTC_ORIG_REPORT_NAME = new Builder(CTC_ORIG_REPORT_NAME_KEY, "CTC++ Report reportfile", ValueType.STRING)
+    .setDescription("Filename used by original HTML-Report")
+    .setDomain(CoreMetrics.DOMAIN_DOCUMENTATION)
+    .setDirection(Metric.DIRECTION_NONE)
+    .setQualitative(false)
+    .setHidden(true)
+    .create();
 
   public static final List<Metric> FILE_METRICS = new ListBuilder()
     .add(CTC_CONDITIONS_TO_COVER,CTC_CONDITIONS_BY_LINE,CTC_COVERED_CONDITIONS_BY_LINE,CTC_UNCOVERED_CONDITIONS)
     .add(CTC_STATEMENTS_TO_COVER,CTC_STATEMENT_COVERAGE,CTC_UNCOVERED_STATEMENTS)
     .add(CTC_LINES_TO_COVER,CTC_COVERAGE_LINE_HITS_DATA,CTC_UNCOVERED_LINES)
+    .add(CTC_ORIG_REPORT_NAME)
     .build();
   public static final List<Metric> PROJECT_METRICS = new ListBuilder()
     .add(CTC_MEASURE_POINTS)
@@ -172,6 +182,7 @@ public class CtcMetrics implements Metrics {
     .build();
   public static final List<Metric> METRICS = new ListBuilder()
     .add(FILE_METRICS).add(PROJECT_METRICS).add(RELATIVE_METRICS).build();
+  
 
   @Override
   public List<Metric> getMetrics() {

@@ -44,7 +44,7 @@ public enum CtcResult {
     + "\\s+" + MEA_PTS.PATTERN_STRING,MULTILINE);
   public static final Pattern FILE_HEADER = Pattern.compile(FILE_MONI.PATTERN_STRING + "\\s+" + FILE_INST.PATTERN_STRING, MULTILINE);
   public static final Pattern SECTION_SEP = compile("^-{77}|={77}$",MULTILINE);
-  public static final Pattern LINE_RESULT = compile("^(?: {10}| *(\\d+)) (?: {10}| *(\\d+)) -? *(\\d+)*.*$",MULTILINE);
+  public static final Pattern LINE_RESULT = compile("^(?: {10}| *(\\d+)) (?: {10}| *(\\d+)) -? *(\\d+) (.*)$",MULTILINE);
   public static final Pattern FILE_RESULT = compile(FILE_COND.PATTERN_STRING + "\\s+" + FILE_STMT.PATTERN_STRING,MULTILINE);
 
 

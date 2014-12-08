@@ -82,7 +82,7 @@ public class CtcCoreMetricDecorator implements Decorator {
 			context.saveMeasure(CoreMetrics.LINES_TO_COVER, context.getMeasure(CoreMetrics.LINES).getValue());
 			context.saveMeasure(CoreMetrics.UNCOVERED_LINES, 0.0);
 			
-			for (int i = 0; i < context.getMeasure(CoreMetrics.LINES).getIntValue(); i++) {
+			for (int i = 1; i <= context.getMeasure(CoreMetrics.LINES).getIntValue(); i++) {
 				lineHits.put(i, 1);
 			}
 			context.saveMeasure(new Measure(CoreMetrics.COVERAGE_LINE_HITS_DATA).setData(KeyValueFormat.format(lineHits)).setPersistenceMode(PersistenceMode.DATABASE));

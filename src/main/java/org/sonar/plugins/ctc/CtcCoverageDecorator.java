@@ -35,10 +35,9 @@ public abstract class CtcCoverageDecorator implements Decorator, CoverageExtensi
   private static Logger log = LoggerFactory.getLogger(CtcCoverageDecorator.class);
 
   public CtcCoverageDecorator(Settings settings) {
-    this.settings =  settings;
+    this.settings = settings;
   }
 
-  
   @Override
   public boolean shouldExecuteOnProject(Project project) {
 
@@ -47,7 +46,7 @@ public abstract class CtcCoverageDecorator implements Decorator, CoverageExtensi
 
   @Override
   public void decorate(Resource resource, DecoratorContext context) {
-	log.trace("Decorating resource: {}",resource);
+    log.trace("Decorating resource: {}", resource);
     computeMeasure(context);
   }
 
@@ -62,7 +61,7 @@ public abstract class CtcCoverageDecorator implements Decorator, CoverageExtensi
   }
 
   private double calculateCoverage(final long uncoveredLines, final long lines) {
-    return 100.0 - ((100.0*uncoveredLines) / lines);
+    return 100.0 - ((100.0 * uncoveredLines) / lines);
   }
 
   @SuppressWarnings("rawtypes")

@@ -43,7 +43,7 @@ import org.sonar.plugins.ctc.api.measures.CtcMeasure.FileMeasureBuilder;
 
 import com.google.common.collect.AbstractIterator;
 
-public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcParser  {
+public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcParser {
 
   private final Scanner scanner;
   private final Matcher matcher;
@@ -58,7 +58,6 @@ public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcPa
 
   private final static Logger log = LoggerFactory.getLogger(CtcTextParser.class);
 
-
   public CtcTextParser(File report) throws FileNotFoundException {
     scanner = new Scanner(report).useDelimiter(SECTION_SEP);
     matcher = CtcResult.FILE_HEADER.matcher("");
@@ -70,10 +69,14 @@ public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcPa
   protected CtcMeasure computeNext() {
     log.debug("Computing next in state: {}", state);
     switch (state) {
-      case BEGIN : return parseReportHead();
-      case PARSING : return parseUnit();
-      case END : return endOfData();
-      default : throw new IllegalStateException("No known state!");
+      case BEGIN:
+        return parseReportHead();
+      case PARSING:
+        return parseUnit();
+      case END:
+        return endOfData();
+      default:
+        throw new IllegalStateException("No known state!");
     }
   }
 
@@ -95,7 +98,7 @@ public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcPa
       return projectBuilder.build();
     } else {
       log.error("Illegal format!");
-      throw new CtcInvalidReportException ("Neither File Header nor Report Footer found!");
+      throw new CtcInvalidReportException("Neither File Header nor Report Footer found!");
     }
 
   }
@@ -115,13 +118,13 @@ public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcPa
 
   private void addLines(CtcMeasure.FileMeasureBuilder bob) throws NoSuchElementException {
     log.trace("Adding lines...");
-    Map<Integer,HashSet<MatchResult>> buffer = new TreeMap<Integer, HashSet<MatchResult>>();
+    Map<Integer, HashSet<MatchResult>> buffer = new TreeMap<Integer, HashSet<MatchResult>>();
     while (!matcher.reset(scanner.next()).usePattern(FILE_RESULT).find()) {
       log.trace("Found linesection...");
       if (matcher.usePattern(LINE_RESULT).find(0)) {
-    	int start = Integer.parseInt(matcher.group(3));
-    	int last;
-    	log.trace("Function start: {}", start);
+        int start = Integer.parseInt(matcher.group(3));
+        int last;
+        log.trace("Function start: {}", start);
         do {
           last = Integer.parseInt(matcher.group(3));
           HashSet<MatchResult> line = buffer.get(last);
@@ -129,22 +132,22 @@ public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcPa
             line = new HashSet<MatchResult>();
             buffer.put(Integer.parseInt(matcher.group(3)), line);
           }
-          log.trace("Added line: {}",matcher.toMatchResult());
+          log.trace("Added line: {}", matcher.toMatchResult());
           line.add(matcher.toMatchResult());
         } while (matcher.find());
         log.trace("Function end: {}", last);
-        
+
       } else {
         log.error("Neither File Result nor Line Result after FileHeader!");
-        log.trace("Matcher: {}",matcher);
+        log.trace("Matcher: {}", matcher);
         throw new CtcInvalidReportException("Neither FileResult nor FileHeader.");
       }
     }
-    log.trace("Found matches: {}",buffer);
-    Entry<Integer,HashSet<MatchResult>> prev = null;
-    for (Entry<Integer,HashSet<MatchResult>> line : buffer.entrySet()) {
+    log.trace("Found matches: {}", buffer);
+    Entry<Integer, HashSet<MatchResult>> prev = null;
+    for (Entry<Integer, HashSet<MatchResult>> line : buffer.entrySet()) {
       int lineId = line.getKey();
-      log.trace("LineId: {}",lineId);
+      log.trace("LineId: {}", lineId);
       int conditions = 0;
       int coveredConditions = 0;
       for (MatchResult result : line.getValue()) {
@@ -158,28 +161,27 @@ public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcPa
             }
           }
         }
-        
+
         if (prev != null) {
-        	if (conditions == 0)
-        	for (int i = prev.getKey(); i < line.getKey(); i++) {
-        		bob.setHits(i, coveredConditions);
-        	}
+          if (conditions == 0)
+            for (int i = prev.getKey(); i < line.getKey(); i++) {
+              bob.setHits(i, coveredConditions);
+            }
         }
         prev = line;
-        
+
       }
-      log.trace("Conditioncoverage: {}/{}",coveredConditions,conditions);
+      log.trace("Conditioncoverage: {}/{}", coveredConditions, conditions);
       bob.setConditions(lineId, conditions, coveredConditions);
     }
   }
-
 
   private void addStatements(CtcMeasure.FileMeasureBuilder bob) {
     try {
       int covered = Integer.parseInt(matcher.group(3));
       int statement = Integer.parseInt(matcher.group(4));
       bob.setStatememts(covered, statement);
-      log.trace("Statements: {}/{}",covered,statement);
+      log.trace("Statements: {}/{}", covered, statement);
     } catch (NumberFormatException e) {
       log.error("Could not read File Statments!");
       log.trace("Matcher: {}", matcher);
@@ -189,7 +191,7 @@ public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcPa
   private void parseReportUnit() {
     int mp = 0;
     try {
-    mp = Integer.parseInt(matcher.group(3));
+      mp = Integer.parseInt(matcher.group(3));
     } catch (NumberFormatException e) {
       log.error("Could not parse '{}' to Integer", matcher.group(3));
       log.trace("Whole Group: {}", matcher.group(0));

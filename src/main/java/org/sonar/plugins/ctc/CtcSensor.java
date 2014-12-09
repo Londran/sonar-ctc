@@ -55,12 +55,13 @@ public class CtcSensor implements Sensor {
 
   @Override
   public void analyse(Project module, SensorContext context) {
-	  log.trace("Module: '{}' Module.getParent(): {} getBranch(): '{}' getModules(): '{}' getRoot(): '{}'",module, module.getParent(),module.getBranch(),module.getModules(),module.getRoot());
+    log.trace("Module: '{}' Module.getParent(): {} getBranch(): '{}' getModules(): '{}' getRoot(): '{}'", module, module.getParent(), module.getBranch(), module.getModules(),
+      module.getRoot());
     java.io.File file = new java.io.File(settings.getString(CtcPlugin.CTC_REPORT_PATH_KEY));
     if (file.canRead()) {
-      log.debug("Using report file {}",file.toString());
+      log.debug("Using report file {}", file.toString());
       CtcReport report = new CtcTextReport(file);
-      parseReport(report,module,context);
+      parseReport(report, module, context);
     } else {
       log.error("Could not read report!");
     }
@@ -71,32 +72,32 @@ public class CtcSensor implements Sensor {
     for (CtcMeasure measure : report) {
       java.io.File file = measure.SOURCE;
       if (file != null && !file.exists()) {
-    	  log.error("File not found {}", file);
-    	  break;
+        log.error("File not found {}", file);
+        break;
       }
-      if (measure.SOURCE != null) log.debug("Absolute Filepath: {}",measure.SOURCE.getAbsolutePath());
+      if (measure.SOURCE != null)
+        log.debug("Absolute Filepath: {}", measure.SOURCE.getAbsolutePath());
       Resource resource = module;
       if (measure.SOURCE != null) {
-    	log.debug("FileName: {}",measure.SOURCE);
+        log.debug("FileName: {}", measure.SOURCE);
         resource = File.fromIOFile(measure.SOURCE, module);
-        resource = context.getResource(resource); 
+        resource = context.getResource(resource);
         if (resource == null) {
-        	log.error("File not mapped to resource!");
-        	continue;
+          log.error("File not mapped to resource!");
+          continue;
         }
       }
 
-      log.debug("Saving measures to: {}",resource);
+      log.debug("Saving measures to: {}", resource);
       for (Measure rawMeasure : measure.MEASURES) {
-    	log.debug("Resource: {} Measure: {}",resource,rawMeasure);
+        log.debug("Resource: {} Measure: {}", resource, rawMeasure);
         context.saveMeasure(resource, rawMeasure);
-        
-      }
-      
-      if (settings.getBoolean(CtcPlugin.CTC_CORE_METRIC_KEY)) {
-    	  
+
       }
 
+      if (settings.getBoolean(CtcPlugin.CTC_CORE_METRIC_KEY)) {
+
+      }
 
     }
   }
@@ -104,7 +105,7 @@ public class CtcSensor implements Sensor {
   @SuppressWarnings("unused")
   private void saveToCore(Resource resource, SensorContext context, Map<Metric, Metric> coreMap) {
     for (Resource child : context.getChildren(resource)) {
-      saveToCore(resource,context,coreMap);
+      saveToCore(resource, context, coreMap);
     }
     for (Entry<Metric, Metric> entry : coreMap.entrySet()) {
       @SuppressWarnings("unchecked")
@@ -116,14 +117,14 @@ public class CtcSensor implements Sensor {
             break;
           case DATA:
             Measure m2 = new Measure(entry.getValue(), measure.getData());
-            context.saveMeasure(resource,m2);
+            context.saveMeasure(resource, m2);
             break;
           case FLOAT:
           case PERCENT:
             context.saveMeasure(resource, entry.getValue(), measure.getValue());
             break;
           default:
-            log.debug("Unknown Datatype! {}",measure);
+            log.debug("Unknown Datatype! {}", measure);
             break;
 
         }

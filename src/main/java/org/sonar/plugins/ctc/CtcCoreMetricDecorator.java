@@ -43,81 +43,81 @@ import com.google.common.collect.ImmutableList;
 
 public class CtcCoreMetricDecorator implements Decorator {
 
-	private final static Logger log = LoggerFactory
-			.getLogger(CtcCoreMetricDecorator.class);
+  private final static Logger log = LoggerFactory
+    .getLogger(CtcCoreMetricDecorator.class);
 
-	private final Settings settings;
-	@SuppressWarnings("rawtypes")
-	private static final Metric[][] conversion = {
-			{ CtcMetrics.CTC_STATEMENTS_TO_COVER, CoreMetrics.STATEMENTS },
-			{ CtcMetrics.CTC_CONDITIONS_TO_COVER, CoreMetrics.CONDITIONS_TO_COVER },
-			{ CtcMetrics.CTC_CONDITIONS_BY_LINE, CoreMetrics.CONDITIONS_BY_LINE },
-			{ CtcMetrics.CTC_UNCOVERED_CONDITIONS, CoreMetrics.UNCOVERED_CONDITIONS } ,
-			{ CtcMetrics.CTC_COVERED_CONDITIONS_BY_LINE, CoreMetrics.COVERED_CONDITIONS_BY_LINE}
-					};
+  private final Settings settings;
+  @SuppressWarnings("rawtypes")
+  private static final Metric[][] conversion = {
+    {CtcMetrics.CTC_STATEMENTS_TO_COVER, CoreMetrics.STATEMENTS},
+    {CtcMetrics.CTC_CONDITIONS_TO_COVER, CoreMetrics.CONDITIONS_TO_COVER},
+    {CtcMetrics.CTC_CONDITIONS_BY_LINE, CoreMetrics.CONDITIONS_BY_LINE},
+    {CtcMetrics.CTC_UNCOVERED_CONDITIONS, CoreMetrics.UNCOVERED_CONDITIONS},
+    {CtcMetrics.CTC_COVERED_CONDITIONS_BY_LINE, CoreMetrics.COVERED_CONDITIONS_BY_LINE}
+  };
 
-	public CtcCoreMetricDecorator(Settings settings) {
-		this.settings = settings;
-	}
+  public CtcCoreMetricDecorator(Settings settings) {
+    this.settings = settings;
+  }
 
-	@SuppressWarnings("rawtypes")
-	@DependsUpon
-	public List<Metric> dependsUponMetrics() {
-		return ImmutableList.<Metric> of(CtcMetrics.CTC_STATEMENTS_TO_COVER,
-				CtcMetrics.CTC_CONDITIONS_TO_COVER,
-				CtcMetrics.CTC_CONDITIONS_BY_LINE,
-				CtcMetrics.CTC_UNCOVERED_CONDITIONS);
-	}
+  @SuppressWarnings("rawtypes")
+  @DependsUpon
+  public List<Metric> dependsUponMetrics() {
+    return ImmutableList.<Metric>of(CtcMetrics.CTC_STATEMENTS_TO_COVER,
+      CtcMetrics.CTC_CONDITIONS_TO_COVER,
+      CtcMetrics.CTC_CONDITIONS_BY_LINE,
+      CtcMetrics.CTC_UNCOVERED_CONDITIONS);
+  }
 
-	@Override
-	public boolean shouldExecuteOnProject(Project project) {
-		return settings.getBoolean(CtcPlugin.CTC_CORE_METRIC_KEY);
-	}
+  @Override
+  public boolean shouldExecuteOnProject(Project project) {
+    return settings.getBoolean(CtcPlugin.CTC_CORE_METRIC_KEY);
+  }
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@Override
-	public void decorate(Resource resource, DecoratorContext context) {
-		if (resource.getScope().equals(Scopes.FILE)) {
-			Map lineHits = new HashMap<Integer, Integer>();
-			context.saveMeasure(CoreMetrics.LINES_TO_COVER, context.getMeasure(CoreMetrics.LINES).getValue());
-			context.saveMeasure(CoreMetrics.UNCOVERED_LINES, 0.0);
-			
-			for (int i = 1; i <= context.getMeasure(CoreMetrics.LINES).getIntValue(); i++) {
-				lineHits.put(i, 1);
-			}
-			context.saveMeasure(new Measure(CoreMetrics.COVERAGE_LINE_HITS_DATA).setData(KeyValueFormat.format(lineHits)).setPersistenceMode(PersistenceMode.DATABASE));
-		}
-		
-		for (Metric[] entry : conversion) {
-			Measure ctc = context.getMeasure(entry[0]);
-			Measure sonar = context.getMeasure(entry[1]);
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  @Override
+  public void decorate(Resource resource, DecoratorContext context) {
+    if (resource.getScope().equals(Scopes.FILE)) {
+      Map lineHits = new HashMap<Integer, Integer>();
+      context.saveMeasure(CoreMetrics.LINES_TO_COVER, context.getMeasure(CoreMetrics.LINES).getValue());
+      context.saveMeasure(CoreMetrics.UNCOVERED_LINES, 0.0);
 
-			if (sonar == null) {
-				sonar = new Measure(entry[1]);
-			}
+      for (int i = 1; i <= context.getMeasure(CoreMetrics.LINES).getIntValue(); i++) {
+        lineHits.put(i, 1);
+      }
+      context.saveMeasure(new Measure(CoreMetrics.COVERAGE_LINE_HITS_DATA).setData(KeyValueFormat.format(lineHits)).setPersistenceMode(PersistenceMode.DATABASE));
+    }
 
-			log.trace("{} -> {}", entry[0].getName(), entry[1].getName());
-			if (ctc != null) {
-				switch (entry[0].getType()) {
-				case DATA:
-					if (ctc.getData() != null)
-						sonar.setData(ctc.getData());
-					break;
-				case INT:
-					if (ctc.getIntValue() != null)
-						sonar.setIntValue(ctc.getIntValue());
-					break;
-				default:
-					log.error("Illegal Type for Core Conversion!");
-					break;
-				}
-				log.trace("Saving Metric: {}",sonar);
-				context.saveMeasure(sonar);
-			} else {
-				log.trace("No Measures found for {} {}", resource, entry[0]);
-			}
+    for (Metric[] entry : conversion) {
+      Measure ctc = context.getMeasure(entry[0]);
+      Measure sonar = context.getMeasure(entry[1]);
 
-		}
-	}
+      if (sonar == null) {
+        sonar = new Measure(entry[1]);
+      }
+
+      log.trace("{} -> {}", entry[0].getName(), entry[1].getName());
+      if (ctc != null) {
+        switch (entry[0].getType()) {
+          case DATA:
+            if (ctc.getData() != null)
+              sonar.setData(ctc.getData());
+            break;
+          case INT:
+            if (ctc.getIntValue() != null)
+              sonar.setIntValue(ctc.getIntValue());
+            break;
+          default:
+            log.error("Illegal Type for Core Conversion!");
+            break;
+        }
+        log.trace("Saving Metric: {}", sonar);
+        context.saveMeasure(sonar);
+      } else {
+        log.trace("No Measures found for {} {}", resource, entry[0]);
+      }
+
+    }
+  }
 
 }

@@ -27,35 +27,34 @@ import org.sonar.api.web.WidgetPropertyType;
 import org.sonar.plugins.ctc.api.measures.CtcMetrics;
 
 @WidgetProperties({
-	  @WidgetProperty(key = "chartTitle", type = WidgetPropertyType.STRING),
-	  @WidgetProperty(key = "sizeMetric", type = WidgetPropertyType.METRIC, defaultValue = CtcMetrics.CTC_STATEMENTS_TO_COVER_KEY, options = {"domain:Tests \\(Testwell CTC\\+\\+\\)"}),
-	  @WidgetProperty(key = "colorMetric", type = WidgetPropertyType.METRIC, defaultValue = CtcMetrics.CTC_CONDITION_COVERAGE_KEY,
-	    options = {"domain:Tests \\(Testwell CTC\\+\\+\\)", "type:PERCENT"}),
-	  @WidgetProperty(key = "heightInPercents", type = WidgetPropertyType.INTEGER, optional = true, defaultValue = "55"),
-	  @WidgetProperty(key = "maxItems", type = WidgetPropertyType.INTEGER, defaultValue = "100"),
-	  @WidgetProperty(key = "reportBaseUrl", type = WidgetPropertyType.STRING)
-	})
-
+  @WidgetProperty(key = "chartTitle", type = WidgetPropertyType.STRING),
+  @WidgetProperty(key = "sizeMetric", type = WidgetPropertyType.METRIC, defaultValue = CtcMetrics.CTC_STATEMENTS_TO_COVER_KEY, options = {"domain:Tests \\(Testwell CTC\\+\\+\\)"}),
+  @WidgetProperty(key = "colorMetric", type = WidgetPropertyType.METRIC, defaultValue = CtcMetrics.CTC_CONDITION_COVERAGE_KEY,
+    options = {"domain:Tests \\(Testwell CTC\\+\\+\\)", "type:PERCENT"}),
+  @WidgetProperty(key = "heightInPercents", type = WidgetPropertyType.INTEGER, optional = true, defaultValue = "55"),
+  @WidgetProperty(key = "maxItems", type = WidgetPropertyType.INTEGER, defaultValue = "100"),
+  @WidgetProperty(key = "reportBaseUrl", type = WidgetPropertyType.STRING)
+})
 public class CtcTreemapWidget extends AbstractRubyTemplate implements
-		RubyRailsWidget {
+  RubyRailsWidget {
 
-	public CtcTreemapWidget() {
-		
-	}
+  public CtcTreemapWidget() {
 
-	@Override
-	public String getId() {
-		return "ctc_treemap_widget";
-	}
+  }
 
-	@Override
-	public String getTitle() {
-		return "Testwell CTC++ Treemap of Components";
-	}
+  @Override
+  public String getId() {
+    return "ctc_treemap_widget";
+  }
 
-	@Override
-	protected String getTemplatePath() {
-		return "/org/sonar/plugins/ctc/widgets/ctc_treemap.html.erb";
-	}
+  @Override
+  public String getTitle() {
+    return "Testwell CTC++ Treemap of Components";
+  }
+
+  @Override
+  protected String getTemplatePath() {
+    return "/org/sonar/plugins/ctc/widgets/ctc_treemap.html.erb";
+  }
 
 }

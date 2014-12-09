@@ -38,8 +38,8 @@ import static org.sonar.api.measures.Metric.ValueType.PERCENT;
 
 @SuppressWarnings("rawtypes")
 public class CtcMetrics implements Metrics {
-	
-	public static final String DOMAIN_CTC_TEST = "Tests (Testwell CTC++)";
+
+  public static final String DOMAIN_CTC_TEST = "Tests (Testwell CTC++)";
 
   public static final String CTC_STATEMENTS_TO_COVER_KEY = "ctc_statements_to_cover";
   public static final Metric<Integer> CTC_STATEMENTS_TO_COVER = new Builder(CTC_STATEMENTS_TO_COVER_KEY, "CTC++ statements to cover", INT)
@@ -110,9 +110,9 @@ public class CtcMetrics implements Metrics {
     .setWorstValue(0.0)
     .setBestValue(100.0)
     .create();
-  
+
   // LineCoverage
-  
+
   public static final String CTC_LINES_TO_COVER_KEY = "ctc_lines_to_cover";
   public static final Metric<Integer> CTC_LINES_TO_COVER = new Metric.Builder(CTC_LINES_TO_COVER_KEY, "Lines to cover", Metric.ValueType.INT)
     .setDescription("Lines to cover")
@@ -147,8 +147,6 @@ public class CtcMetrics implements Metrics {
     .setDeleteHistoricalData(true)
     .create();
 
-
-
   public static final String CTC_MEASURE_POINTS_KEY = "ctc_measure_points";
   public static final Metric<Integer> CTC_MEASURE_POINTS = new Builder(CTC_MEASURE_POINTS_KEY, "CTC++ used measurement points", INT)
     .setDescription("Overall used measurement points by CTC++")
@@ -156,7 +154,6 @@ public class CtcMetrics implements Metrics {
     .setDirection(DIRECTION_BETTER)
     .setQualitative(false)
     .create();
-
 
   public static final String CTC_ORIG_REPORT_NAME_KEY = "ctc_orig_report_name";
   public static final Metric<String> CTC_ORIG_REPORT_NAME = new Builder(CTC_ORIG_REPORT_NAME_KEY, "CTC++ Report reportfile", ValueType.STRING)
@@ -168,21 +165,20 @@ public class CtcMetrics implements Metrics {
     .create();
 
   public static final List<Metric> FILE_METRICS = new ListBuilder()
-    .add(CTC_CONDITIONS_TO_COVER,CTC_CONDITIONS_BY_LINE,CTC_COVERED_CONDITIONS_BY_LINE,CTC_UNCOVERED_CONDITIONS)
-    .add(CTC_STATEMENTS_TO_COVER,CTC_STATEMENT_COVERAGE,CTC_UNCOVERED_STATEMENTS)
-    .add(CTC_LINES_TO_COVER,CTC_COVERAGE_LINE_HITS_DATA,CTC_UNCOVERED_LINES)
+    .add(CTC_CONDITIONS_TO_COVER, CTC_CONDITIONS_BY_LINE, CTC_COVERED_CONDITIONS_BY_LINE, CTC_UNCOVERED_CONDITIONS)
+    .add(CTC_STATEMENTS_TO_COVER, CTC_STATEMENT_COVERAGE, CTC_UNCOVERED_STATEMENTS)
+    .add(CTC_LINES_TO_COVER, CTC_COVERAGE_LINE_HITS_DATA, CTC_UNCOVERED_LINES)
     .add(CTC_ORIG_REPORT_NAME)
     .build();
   public static final List<Metric> PROJECT_METRICS = new ListBuilder()
     .add(CTC_MEASURE_POINTS)
     .build();
   public static final List<Metric> RELATIVE_METRICS = new ListBuilder()
-    .add(CTC_CONDITION_COVERAGE,CTC_STATEMENT_COVERAGE)
+    .add(CTC_CONDITION_COVERAGE, CTC_STATEMENT_COVERAGE)
     .add(CTC_LINE_COVERAGE)
     .build();
   public static final List<Metric> METRICS = new ListBuilder()
     .add(FILE_METRICS).add(PROJECT_METRICS).add(RELATIVE_METRICS).build();
-  
 
   @Override
   public List<Metric> getMetrics() {
@@ -202,7 +198,7 @@ public class CtcMetrics implements Metrics {
       return this;
     }
 
-    private ListBuilder add(Metric ... metrics) {
+    private ListBuilder add(Metric... metrics) {
       for (Metric metric : metrics) {
         elements.add(metric);
       }

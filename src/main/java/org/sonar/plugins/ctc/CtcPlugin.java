@@ -42,7 +42,11 @@ public class CtcPlugin extends SonarPlugin {
 
     CtcMetrics.class,
     CtcTreemapWidget.class,
-    CtcSensor.class, CtcConditionCoverageDecorator.class, CtcStatementCoverageDecorator.class, CtcCoreMetricDecorator.class, CtcHtmlDecorator.class,
+    CtcSensor.class,
+    CtcConditionCoverageDecorator.class,
+    CtcStatementCoverageDecorator.class,
+    CtcCoreMetricDecorator.class,
+    CtcHtmlDecorator.class,
     PropertyDefinition.builder(CTC_REPORT_PATH_KEY)
       .hidden().defaultValue("report.txt").type(PropertyType.STRING).name("CTC_REPORT_PATH").build(),
     PropertyDefinition.builder(CTC_REPORT_TYPE_KEY)
@@ -52,7 +56,8 @@ public class CtcPlugin extends SonarPlugin {
     PropertyDefinition.builder(CTC_DISABLE_DECORATOR_KEY)
       .hidden().type(PropertyType.BOOLEAN).defaultValue("false").name("CTC_DISABLE_DECORATOR").build(),
     PropertyDefinition.builder(CTC_CORE_METRIC_KEY)
-      .defaultValue("false").name("Core Metric").description("Should Testwell CTC++ replace the core metrics?").category("Code Coverage").subCategory("CTC++").type(PropertyType.BOOLEAN).build()
+      .defaultValue("false").name("Core Metric").description("Should Testwell CTC++ replace the core metrics?").category("Code Coverage").subCategory("CTC++")
+      .type(PropertyType.BOOLEAN).build()
     );
 
   @SuppressWarnings("rawtypes")
@@ -60,7 +65,5 @@ public class CtcPlugin extends SonarPlugin {
   public List getExtensions() {
     return EXTENSIONS;
   }
-
-
 
 }

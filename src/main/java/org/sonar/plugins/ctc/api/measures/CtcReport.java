@@ -25,6 +25,6 @@ import java.util.Map;
 
 public interface CtcReport extends Iterable<CtcMeasure> {
 
-  Map<CtcResult,String> getReportDetails();
+  Map<CtcResult, String> getReportDetails();
 
 }

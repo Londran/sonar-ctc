@@ -21,7 +21,6 @@ package org.sonar.plugins.ctc.api.measures;
 
 import com.google.common.collect.Maps;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonar.api.measures.Measure;
@@ -39,23 +38,22 @@ import java.util.SortedMap;
 
 @SuppressWarnings("rawtypes")
 public class CtcMeasure {
-	
-	static Logger log = LoggerFactory.getLogger(CtcMeasure.class);
 
+  static Logger log = LoggerFactory.getLogger(CtcMeasure.class);
 
-  private CtcMeasure(final File SOURCE, final Collection<Measure>  collection) {
+  private CtcMeasure(final File SOURCE, final Collection<Measure> collection) {
     this.SOURCE = SOURCE;
     this.MEASURES = collection;
     if (SOURCE != null && !SOURCE.exists()) {
-    	log.error("File {} does not exist!", SOURCE);
-    	
+      log.error("File {} does not exist!", SOURCE);
+
     }
     if (SOURCE != null) {
-    	log.trace("AbsoluteFilePath of {} : {}",SOURCE,SOURCE.getAbsolutePath());
+      log.trace("AbsoluteFilePath of {} : {}", SOURCE, SOURCE.getAbsolutePath());
     } else {
-    	log.trace("PROJECTMEASURE");
+      log.trace("PROJECTMEASURE");
     }
-    
+
   }
 
   public final File SOURCE;
@@ -65,8 +63,7 @@ public class CtcMeasure {
 
     public static final List<Metric> METRICS = CtcMetrics.FILE_METRICS;
 
-
-    private int totalCoveredLines = 0,totalStatements = 0, totalCoveredStatements = 0, totalConditions = 0, totalCoveredConditions = 0;
+    private int totalCoveredLines = 0, totalStatements = 0, totalCoveredStatements = 0, totalConditions = 0, totalCoveredConditions = 0;
     private SortedMap<Integer, Integer> conditionsByLine = Maps.newTreeMap();
     private SortedMap<Integer, Integer> coveredConditionsByLine = Maps.newTreeMap();
     private SortedMap<Integer, Integer> hitsByLine = Maps.newTreeMap();
@@ -89,20 +86,20 @@ public class CtcMeasure {
     }
 
     public FileMeasureBuilder setStatememts(int covered, int statement) {
-      totalStatements =statement;
+      totalStatements = statement;
       totalCoveredStatements = covered;
       return this;
     }
-    
+
     public FileMeasureBuilder setHits(int lineId, int hits) {
-        if (!hitsByLine.containsKey(lineId)) {
-          hitsByLine.put(lineId, hits);
-          if (hits > 0) {
-            totalCoveredLines += 1;
-          }
+      if (!hitsByLine.containsKey(lineId)) {
+        hitsByLine.put(lineId, hits);
+        if (hits > 0) {
+          totalCoveredLines += 1;
         }
-        return this;
       }
+      return this;
+    }
 
     public FileMeasureBuilder setConditions(int lineId, int conditions, int coveredConditions) {
       if (conditions > 0 && !conditionsByLine.containsKey(lineId)) {
@@ -113,7 +110,7 @@ public class CtcMeasure {
       }
       return this;
     }
-    
+
     public int getCoveredLines() {
       return totalCoveredLines;
     }
@@ -121,7 +118,7 @@ public class CtcMeasure {
     public int getLinesToCover() {
       return hitsByLine.size();
     }
-    
+
     public SortedMap<Integer, Integer> getHitsByLine() {
       return Collections.unmodifiableSortedMap(hitsByLine);
     }
@@ -188,9 +185,9 @@ public class CtcMeasure {
 
     public static FileMeasureBuilder create(File file) {
       if (!file.exists()) {
-        log.error("File {} not found!",file);
+        log.error("File {} not found!", file);
       }
-      log.debug("Absolute Filepath: '{}'",file.getAbsolutePath());
+      log.debug("Absolute Filepath: '{}'", file.getAbsolutePath());
       return new FileMeasureBuilder(file);
     }
   }
@@ -207,7 +204,7 @@ public class CtcMeasure {
     public Collection<Measure> createMeasures() {
       Collection<Measure> measures = new ArrayList<Measure>();
       if (measurePoints > 0) {
-        measures.add(new Measure<Serializable>(CtcMetrics.CTC_MEASURE_POINTS).setValue((double)measurePoints));
+        measures.add(new Measure<Serializable>(CtcMetrics.CTC_MEASURE_POINTS).setValue((double) measurePoints));
       }
       return measures;
     }
@@ -219,7 +216,8 @@ public class CtcMeasure {
 
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    if (SOURCE == null) sb.append("Report Measures: ");
+    if (SOURCE == null)
+      sb.append("Report Measures: ");
     else sb.append("File ").append(SOURCE.toString()).append(" Measures: \n");
 
     for (Measure measure : MEASURES) {

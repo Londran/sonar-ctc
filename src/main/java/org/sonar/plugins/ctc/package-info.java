@@ -20,5 +20,6 @@
 
 @ParametersAreNonnullByDefault
 package org.sonar.plugins.ctc;
+
 import javax.annotation.ParametersAreNonnullByDefault;
 

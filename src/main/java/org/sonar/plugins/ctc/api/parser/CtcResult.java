@@ -39,25 +39,23 @@ public enum CtcResult {
   FILE_STMT("^ {6} +\\d+ % \\( *(\\d+)/ *(\\d+)\\) statement$");
 
   public static final Pattern REPORT_HEADER = Pattern.compile(MON_SYM.PATTERN_STRING + "\\s+" + MON_DAT.PATTERN_STRING
-    + "\\s+" + LIS_DTE.PATTERN_STRING + "\\s+" + COV_VIW.PATTERN_STRING,MULTILINE);
+    + "\\s+" + LIS_DTE.PATTERN_STRING + "\\s+" + COV_VIW.PATTERN_STRING, MULTILINE);
   public static final Pattern REPORT_FOOTER = Pattern.compile(SRC_FLS.PATTERN_STRING + "\\s+" + SRC_LNS.PATTERN_STRING
-    + "\\s+" + MEA_PTS.PATTERN_STRING,MULTILINE);
+    + "\\s+" + MEA_PTS.PATTERN_STRING, MULTILINE);
   public static final Pattern FILE_HEADER = Pattern.compile(FILE_MONI.PATTERN_STRING + "\\s+" + FILE_INST.PATTERN_STRING, MULTILINE);
-  public static final Pattern SECTION_SEP = compile("^-{77}|={77}$",MULTILINE);
-  public static final Pattern LINE_RESULT = compile("^(?: {10}| *(\\d+)) (?: {10}| *(\\d+)) -? *(\\d+) (.*)$",MULTILINE);
-  public static final Pattern FILE_RESULT = compile(FILE_COND.PATTERN_STRING + "\\s+" + FILE_STMT.PATTERN_STRING,MULTILINE);
-
+  public static final Pattern SECTION_SEP = compile("^-{77}|={77}$", MULTILINE);
+  public static final Pattern LINE_RESULT = compile("^(?: {10}| *(\\d+)) (?: {10}| *(\\d+)) -? *(\\d+) (.*)$", MULTILINE);
+  public static final Pattern FILE_RESULT = compile(FILE_COND.PATTERN_STRING + "\\s+" + FILE_STMT.PATTERN_STRING, MULTILINE);
 
   private final String PATTERN_STRING;
 
   /*
-         1                  8     1: T || _ || _
-         0         58 -    15     if (value % divisor == 0)
+   * 1 8 1: T || _ || _
+   * 0 58 - 15 if (value % divisor == 0)
    */
 
   private CtcResult(String key) {
-     PATTERN_STRING = key;
+    PATTERN_STRING = key;
   }
-
 
 }

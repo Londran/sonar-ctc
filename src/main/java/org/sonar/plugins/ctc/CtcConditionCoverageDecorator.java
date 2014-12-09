@@ -39,9 +39,8 @@ public class CtcConditionCoverageDecorator extends CtcCoverageDecorator {
 
   @DependsUpon
   public List<Metric> dependsUponMetrics() {
-	  return ImmutableList.<Metric>of(CtcMetrics.CTC_UNCOVERED_CONDITIONS, CtcMetrics.CTC_CONDITIONS_TO_COVER);
+    return ImmutableList.<Metric>of(CtcMetrics.CTC_UNCOVERED_CONDITIONS, CtcMetrics.CTC_CONDITIONS_TO_COVER);
   }
-
 
   @Override
   protected Metric getGeneratedMetric() {
@@ -51,14 +50,16 @@ public class CtcConditionCoverageDecorator extends CtcCoverageDecorator {
   @Override
   protected Integer countElements(DecoratorContext context) {
     Measure measure = context.getMeasure(CtcMetrics.CTC_CONDITIONS_TO_COVER);
-    if (measure == null) return null;
+    if (measure == null)
+      return null;
     else return measure.getIntValue();
   }
 
   @Override
   protected Integer countUncoveredElements(DecoratorContext context) {
     Measure measure = context.getMeasure(CtcMetrics.CTC_UNCOVERED_CONDITIONS);
-    if (measure == null) return null;
+    if (measure == null)
+      return null;
     else return measure.getIntValue();
   }
 

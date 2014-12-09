@@ -40,9 +40,9 @@ public class CtcMetricsTest {
   @Test
   public void testGetMetrics() {
     LOG.info("Starting Metrics test.");
-    LOG.debug("Metrics: {}",testee.getMetrics());
+    LOG.debug("Metrics: {}", testee.getMetrics());
     assertThat(testee.getMetrics()).doesNotHaveDuplicates()
-    .hasSize(14);
+      .hasSize(14);
   }
 
 }

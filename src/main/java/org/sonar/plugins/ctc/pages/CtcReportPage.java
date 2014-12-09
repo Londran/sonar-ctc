@@ -23,26 +23,26 @@ import org.sonar.api.web.RubyRailsPage;
 
 public class CtcReportPage implements RubyRailsPage {
 
-	public CtcReportPage() {
-		// TODO Auto-generated constructor stub
-	}
+  public CtcReportPage() {
+    // TODO Auto-generated constructor stub
+  }
 
-	@Override
-	public String getId() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  @Override
+  public String getId() {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-	@Override
-	public String getTitle() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  @Override
+  public String getTitle() {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-	@Override
-	public String getTemplate() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  @Override
+  public String getTemplate() {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
 }

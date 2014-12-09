@@ -36,7 +36,6 @@ public abstract class CtcTextParserTest {
   private CtcTextParser testee;
   private static Logger log = LoggerFactory.getLogger(CtcTextParserTest.class);
 
-
   @Before
   public void setUp() throws Exception {
     testee = new CtcTextParser(getReport());
@@ -49,7 +48,8 @@ public abstract class CtcTextParserTest {
   @Test
   public void testHasNext() {
     try {
-      while (testee.next() != null);
+      while (testee.next() != null)
+        ;
       fail("No Such Element not thrown!");
     } catch (NoSuchElementException e) {
       Assertions.assertThat(testee.hasNext()).isEqualTo(false);
@@ -78,7 +78,7 @@ public abstract class CtcTextParserTest {
   @Test
   public void testGetReportDetails() {
     while (testee.hasNext()) {
-      log.info("FOUND ELEMENT: {}",testee.next());
+      log.info("FOUND ELEMENT: {}", testee.next());
     }
   }
 

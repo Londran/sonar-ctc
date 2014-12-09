@@ -40,73 +40,72 @@ import org.sonar.api.resources.Resource;
 import org.sonar.plugins.ctc.api.measures.CtcMetrics;
 
 public class CtcHtmlDecorator implements Decorator {
-	
-	private static final String[] indizes = {"CTCHTML/indexF.html", "CTCHTML/indexC.html"};
-	
-	private final static Pattern FILE_PATTERN = Pattern.compile("\\./?([^\\.]*(\\..+)?)");
 
-	private Map<String, String> hrefMap;
-	public static final Logger log = LoggerFactory
-			.getLogger(CtcHtmlDecorator.class);
+  private static final String[] indizes = {"CTCHTML/indexF.html", "CTCHTML/indexC.html"};
 
-	public CtcHtmlDecorator() {
-		log.info("CTCHTML_DECORATOR STARTED");
-		hrefMap = new HashMap<String, String>();
-		try {
-			for (String s : indizes) {
-				parseSource(new File(s));
-			}
+  private final static Pattern FILE_PATTERN = Pattern.compile("\\./?([^\\.]*(\\..+)?)");
 
-			if (log.isDebugEnabled()) {
-				log.trace("Map");
-				for (Entry<String, String> entry : hrefMap.entrySet()) {
-					log.debug("Map - Entry: '{}':'{}'",entry.getKey(),entry.getValue());
-				}
-			}
-		} catch (IOException e) {
-			hrefMap = null;
-			log.debug("HTML-Report not found");
-		}
-		
+  private Map<String, String> hrefMap;
+  public static final Logger log = LoggerFactory
+    .getLogger(CtcHtmlDecorator.class);
 
-	}
-	
-	private void parseSource (File file) throws IOException {
-		Matcher matcher = FILE_PATTERN.matcher("");
-		Source source = new Source(file);
-		for (Element element : source.getAllElements("a")) {
-			matcher.reset(element.getTextExtractor().toString());
-			if (matcher.matches()) {
-				String path;
-				if (matcher.group(2) != null) {
-					path = matcher.group(1);
-				} else {
-					path = matcher.group(1) + "/";
-				}
-				log.trace("Adding '{}' --> '{}'",path, element.getAttributeValue("href"));
-				hrefMap.put(path, element.getAttributeValue("href"));
-			}
-		}
-	}
+  public CtcHtmlDecorator() {
+    log.info("CTCHTML_DECORATOR STARTED");
+    hrefMap = new HashMap<String, String>();
+    try {
+      for (String s : indizes) {
+        parseSource(new File(s));
+      }
 
-	@Override
-	public boolean shouldExecuteOnProject(Project project) {
-		return hrefMap != null;
-	}
+      if (log.isDebugEnabled()) {
+        log.trace("Map");
+        for (Entry<String, String> entry : hrefMap.entrySet()) {
+          log.debug("Map - Entry: '{}':'{}'", entry.getKey(), entry.getValue());
+        }
+      }
+    } catch (IOException e) {
+      hrefMap = null;
+      log.debug("HTML-Report not found");
+    }
 
-	@Override
-	public void decorate(Resource resource, DecoratorContext context) {
-		
-		String href = hrefMap.get(resource.getPath());
-		if (href == null) {
-			href = "index.html";
-		}
-		log.trace("Mapping orig report {} --> {}", resource, href);
-		@SuppressWarnings("rawtypes")
-		Measure path = new Measure(CtcMetrics.CTC_ORIG_REPORT_NAME);
-		path.setData(href);
-		context.saveMeasure(path);
-		
-	}
+  }
+
+  private void parseSource(File file) throws IOException {
+    Matcher matcher = FILE_PATTERN.matcher("");
+    Source source = new Source(file);
+    for (Element element : source.getAllElements("a")) {
+      matcher.reset(element.getTextExtractor().toString());
+      if (matcher.matches()) {
+        String path;
+        if (matcher.group(2) != null) {
+          path = matcher.group(1);
+        } else {
+          path = matcher.group(1) + "/";
+        }
+        log.trace("Adding '{}' --> '{}'", path, element.getAttributeValue("href"));
+        hrefMap.put(path, element.getAttributeValue("href"));
+      }
+    }
+  }
+
+  @Override
+  public boolean shouldExecuteOnProject(Project project) {
+    return hrefMap != null;
+  }
+
+  @Override
+  public void decorate(Resource resource, DecoratorContext context) {
+
+    String href = hrefMap.get(resource.getPath());
+    if (href == null) {
+      href = "index.html";
+    }
+    log.trace("Mapping orig report {} --> {}", resource, href);
+    @SuppressWarnings("rawtypes")
+    Measure path = new Measure(CtcMetrics.CTC_ORIG_REPORT_NAME);
+    path.setData(href);
+    context.saveMeasure(path);
+
+  }
 
 }

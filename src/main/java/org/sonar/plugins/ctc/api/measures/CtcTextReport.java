@@ -34,7 +34,7 @@ import java.util.NoSuchElementException;
 public class CtcTextReport implements CtcReport {
 
   private final File file;
-  private final Map<CtcResult,String> projectDetails;
+  private final Map<CtcResult, String> projectDetails;
 
   private final static Logger log = LoggerFactory.getLogger(CtcTextReport.class);
 
@@ -49,7 +49,7 @@ public class CtcTextReport implements CtcReport {
     try {
       return new CtcTextParser(file);
     } catch (FileNotFoundException e) {
-      log.error("Report not found.",e);
+      log.error("Report not found.", e);
       return new EmptyIterator();
     }
   }

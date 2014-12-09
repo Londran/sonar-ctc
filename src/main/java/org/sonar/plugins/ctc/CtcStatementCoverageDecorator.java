@@ -36,13 +36,12 @@ public class CtcStatementCoverageDecorator extends CtcCoverageDecorator {
   public CtcStatementCoverageDecorator(Settings settings) {
     super(settings);
   }
-  
+
   @DependsUpon
   public List<Metric> dependsUponMetrics() {
-	  return ImmutableList.<Metric>of(CtcMetrics.CTC_UNCOVERED_STATEMENTS, CtcMetrics.CTC_STATEMENTS_TO_COVER);
+    return ImmutableList.<Metric>of(CtcMetrics.CTC_UNCOVERED_STATEMENTS, CtcMetrics.CTC_STATEMENTS_TO_COVER);
   }
 
-  
   @Override
   protected Metric getGeneratedMetric() {
     return CtcMetrics.CTC_STATEMENT_COVERAGE;
@@ -50,16 +49,18 @@ public class CtcStatementCoverageDecorator extends CtcCoverageDecorator {
 
   @Override
   protected Integer countElements(DecoratorContext context) {
-	
+
     Measure measure = context.getMeasure(CtcMetrics.CTC_STATEMENTS_TO_COVER);
-    if (measure == null) return null;
+    if (measure == null)
+      return null;
     else return measure.getIntValue();
   }
 
   @Override
   protected Integer countUncoveredElements(DecoratorContext context) {
     Measure measure = context.getMeasure(CtcMetrics.CTC_UNCOVERED_STATEMENTS);
-    if (measure == null) return null;
+    if (measure == null)
+      return null;
     else return measure.getIntValue();
   }
 }

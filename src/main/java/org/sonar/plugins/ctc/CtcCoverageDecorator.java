@@ -47,7 +47,7 @@ public abstract class CtcCoverageDecorator implements Decorator, CoverageExtensi
 
   @Override
   public void decorate(Resource resource, DecoratorContext context) {
-	log.debug("Decorating resource: {}",resource);
+	log.trace("Decorating resource: {}",resource);
     computeMeasure(context);
   }
 

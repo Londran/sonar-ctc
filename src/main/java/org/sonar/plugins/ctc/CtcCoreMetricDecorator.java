@@ -96,7 +96,7 @@ public class CtcCoreMetricDecorator implements Decorator {
 				sonar = new Measure(entry[1]);
 			}
 
-			log.debug("{} -> {}", entry[0].getName(), entry[1].getName());
+			log.trace("{} -> {}", entry[0].getName(), entry[1].getName());
 			if (ctc != null) {
 				switch (entry[0].getType()) {
 				case DATA:
@@ -111,10 +111,10 @@ public class CtcCoreMetricDecorator implements Decorator {
 					log.error("Illegal Type for Core Conversion!");
 					break;
 				}
-				log.debug("Saving Metric: {}",sonar);
+				log.trace("Saving Metric: {}",sonar);
 				context.saveMeasure(sonar);
 			} else {
-				log.debug("No Measures found for {} {}", resource, entry[0]);
+				log.trace("No Measures found for {} {}", resource, entry[0]);
 			}
 
 		}

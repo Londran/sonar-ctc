@@ -59,8 +59,7 @@ public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcPa
   private final static Logger log = LoggerFactory.getLogger(CtcTextParser.class);
 
 
-  @SuppressWarnings("resource")
-public CtcTextParser(File report) throws FileNotFoundException {
+  public CtcTextParser(File report) throws FileNotFoundException {
     scanner = new Scanner(report).useDelimiter(SECTION_SEP);
     matcher = CtcResult.FILE_HEADER.matcher("");
     state = State.BEGIN;
@@ -115,14 +114,14 @@ public CtcTextParser(File report) throws FileNotFoundException {
   }
 
   private void addLines(CtcMeasure.FileMeasureBuilder bob) throws NoSuchElementException {
-    log.debug("Adding lines...");
+    log.trace("Adding lines...");
     Map<Integer,HashSet<MatchResult>> buffer = new TreeMap<Integer, HashSet<MatchResult>>();
     while (!matcher.reset(scanner.next()).usePattern(FILE_RESULT).find()) {
-      log.debug("Found linesection...");
+      log.trace("Found linesection...");
       if (matcher.usePattern(LINE_RESULT).find(0)) {
     	int start = Integer.parseInt(matcher.group(3));
     	int last;
-    	log.debug("Function start: {}", start);
+    	log.trace("Function start: {}", start);
         do {
           last = Integer.parseInt(matcher.group(3));
           HashSet<MatchResult> line = buffer.get(last);
@@ -130,22 +129,22 @@ public CtcTextParser(File report) throws FileNotFoundException {
             line = new HashSet<MatchResult>();
             buffer.put(Integer.parseInt(matcher.group(3)), line);
           }
-          log.debug("Added line: {}",matcher.toMatchResult());
+          log.trace("Added line: {}",matcher.toMatchResult());
           line.add(matcher.toMatchResult());
         } while (matcher.find());
-        log.debug("Function end: {}", last);
+        log.trace("Function end: {}", last);
         
       } else {
         log.error("Neither File Result nor Line Result after FileHeader!");
-        log.debug("Matcher: {}",matcher);
+        log.trace("Matcher: {}",matcher);
         throw new CtcInvalidReportException("Neither FileResult nor FileHeader.");
       }
     }
-    log.debug("Found matches: {}",buffer);
+    log.trace("Found matches: {}",buffer);
     Entry<Integer,HashSet<MatchResult>> prev = null;
     for (Entry<Integer,HashSet<MatchResult>> line : buffer.entrySet()) {
       int lineId = line.getKey();
-      log.debug("LineId: {}",lineId);
+      log.trace("LineId: {}",lineId);
       int conditions = 0;
       int coveredConditions = 0;
       for (MatchResult result : line.getValue()) {
@@ -180,10 +179,10 @@ public CtcTextParser(File report) throws FileNotFoundException {
       int covered = Integer.parseInt(matcher.group(3));
       int statement = Integer.parseInt(matcher.group(4));
       bob.setStatememts(covered, statement);
-      log.debug("Statements: {}/{}",covered,statement);
+      log.trace("Statements: {}/{}",covered,statement);
     } catch (NumberFormatException e) {
       log.error("Could not read File Statments!");
-      log.debug("Matcher: {}", matcher);
+      log.trace("Matcher: {}", matcher);
     }
   }
 
@@ -193,7 +192,7 @@ public CtcTextParser(File report) throws FileNotFoundException {
     mp = Integer.parseInt(matcher.group(3));
     } catch (NumberFormatException e) {
       log.error("Could not parse '{}' to Integer", matcher.group(3));
-      log.debug("Whole Group: {}", matcher.group(0));
+      log.trace("Whole Group: {}", matcher.group(0));
     }
     projectBuilder.setMeasurePoints(mp);
   }

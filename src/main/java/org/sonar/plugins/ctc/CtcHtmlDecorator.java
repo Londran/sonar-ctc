@@ -58,14 +58,14 @@ public class CtcHtmlDecorator implements Decorator {
 			}
 
 			if (log.isDebugEnabled()) {
-				log.debug("Map");
+				log.trace("Map");
 				for (Entry<String, String> entry : hrefMap.entrySet()) {
 					log.debug("Map - Entry: '{}':'{}'",entry.getKey(),entry.getValue());
 				}
 			}
 		} catch (IOException e) {
 			hrefMap = null;
-			e.printStackTrace();
+			log.debug("HTML-Report not found");
 		}
 		
 
@@ -74,7 +74,6 @@ public class CtcHtmlDecorator implements Decorator {
 	private void parseSource (File file) throws IOException {
 		Matcher matcher = FILE_PATTERN.matcher("");
 		Source source = new Source(file);
-		log.debug("Useing source {}", source);
 		for (Element element : source.getAllElements("a")) {
 			matcher.reset(element.getTextExtractor().toString());
 			if (matcher.matches()) {
@@ -84,7 +83,7 @@ public class CtcHtmlDecorator implements Decorator {
 				} else {
 					path = matcher.group(1) + "/";
 				}
-				log.debug("Adding '{}' --> '{}'",path, element.getAttributeValue("href"));
+				log.trace("Adding '{}' --> '{}'",path, element.getAttributeValue("href"));
 				hrefMap.put(path, element.getAttributeValue("href"));
 			}
 		}
@@ -102,7 +101,7 @@ public class CtcHtmlDecorator implements Decorator {
 		if (href == null) {
 			href = "index.html";
 		}
-		log.debug("Mapping orig report {} --> {}", resource, href);
+		log.trace("Mapping orig report {} --> {}", resource, href);
 		@SuppressWarnings("rawtypes")
 		Measure path = new Measure(CtcMetrics.CTC_ORIG_REPORT_NAME);
 		path.setData(href);

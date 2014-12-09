@@ -51,9 +51,9 @@ public class CtcMeasure {
     	
     }
     if (SOURCE != null) {
-    	log.debug("AbsoluteFilePath of {} : {}",SOURCE,SOURCE.getAbsolutePath());
+    	log.trace("AbsoluteFilePath of {} : {}",SOURCE,SOURCE.getAbsolutePath());
     } else {
-    	log.debug("PROJECTMEASURE");
+    	log.trace("PROJECTMEASURE");
     }
     
   }

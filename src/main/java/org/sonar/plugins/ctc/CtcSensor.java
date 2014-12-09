@@ -55,7 +55,7 @@ public class CtcSensor implements Sensor {
 
   @Override
   public void analyse(Project module, SensorContext context) {
-	  log.debug("Module: '{}' Module.getParent(): {} getBranch(): '{}' getModules(): '{}' getRoot(): '{}'",module, module.getParent(),module.getBranch(),module.getModules(),module.getRoot());
+	  log.trace("Module: '{}' Module.getParent(): {} getBranch(): '{}' getModules(): '{}' getRoot(): '{}'",module, module.getParent(),module.getBranch(),module.getModules(),module.getRoot());
     java.io.File file = new java.io.File(settings.getString(CtcPlugin.CTC_REPORT_PATH_KEY));
     if (file.canRead()) {
       log.debug("Using report file {}",file.toString());

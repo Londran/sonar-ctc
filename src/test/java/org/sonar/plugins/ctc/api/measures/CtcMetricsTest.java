@@ -19,12 +19,12 @@
  */
 package org.sonar.plugins.ctc.api.measures;
 
-import org.slf4j.Logger;
-
-import org.slf4j.LoggerFactory;
 import org.junit.Before;
 import org.junit.Test;
-import static org.fest.assertions.Assertions.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static org.fest.assertions.Assertions.assertThat;
 
 public class CtcMetricsTest {
 

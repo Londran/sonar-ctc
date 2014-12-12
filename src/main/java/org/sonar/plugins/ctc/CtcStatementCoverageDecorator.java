@@ -19,8 +19,7 @@
  */
 package org.sonar.plugins.ctc;
 
-import java.util.List;
-
+import com.google.common.collect.ImmutableList;
 import org.sonar.api.batch.DecoratorContext;
 import org.sonar.api.batch.DependsUpon;
 import org.sonar.api.config.Settings;
@@ -28,7 +27,7 @@ import org.sonar.api.measures.Measure;
 import org.sonar.api.measures.Metric;
 import org.sonar.plugins.ctc.api.measures.CtcMetrics;
 
-import com.google.common.collect.ImmutableList;
+import java.util.List;
 
 @SuppressWarnings("rawtypes")
 public class CtcStatementCoverageDecorator extends CtcCoverageDecorator {

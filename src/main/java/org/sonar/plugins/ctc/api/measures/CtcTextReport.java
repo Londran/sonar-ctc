@@ -19,8 +19,8 @@
  */
 package org.sonar.plugins.ctc.api.measures;
 
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonar.plugins.ctc.api.parser.CtcResult;
 import org.sonar.plugins.ctc.api.parser.CtcTextParser;
 

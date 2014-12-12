@@ -19,10 +19,7 @@
  */
 package org.sonar.plugins.ctc;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.collect.ImmutableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonar.api.batch.Decorator;
@@ -39,7 +36,9 @@ import org.sonar.api.resources.Scopes;
 import org.sonar.api.utils.KeyValueFormat;
 import org.sonar.plugins.ctc.api.measures.CtcMetrics;
 
-import com.google.common.collect.ImmutableList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class CtcCoreMetricDecorator implements Decorator {
 

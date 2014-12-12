@@ -20,14 +20,13 @@
 package org.sonar.plugins.ctc;
 
 import org.sonar.api.PropertyType;
+import org.sonar.api.SonarPlugin;
 import org.sonar.api.config.PropertyDefinition;
 import org.sonar.plugins.ctc.api.measures.CtcMetrics;
 import org.sonar.plugins.ctc.widgets.CtcTreemapWidget;
 
 import java.util.Arrays;
 import java.util.List;
-
-import org.sonar.api.SonarPlugin;
 
 public class CtcPlugin extends SonarPlugin {
 

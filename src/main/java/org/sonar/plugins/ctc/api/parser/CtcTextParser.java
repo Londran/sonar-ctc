@@ -19,12 +19,13 @@
  */
 package org.sonar.plugins.ctc.api.parser;
 
-import static org.sonar.plugins.ctc.api.parser.CtcResult.FILE_HEADER;
-import static org.sonar.plugins.ctc.api.parser.CtcResult.FILE_RESULT;
-import static org.sonar.plugins.ctc.api.parser.CtcResult.LINE_RESULT;
-import static org.sonar.plugins.ctc.api.parser.CtcResult.SECTION_SEP;
-
+import com.google.common.collect.AbstractIterator;
 import org.jfree.util.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.sonar.plugins.ctc.api.exceptions.CtcInvalidReportException;
+import org.sonar.plugins.ctc.api.measures.CtcMeasure;
+import org.sonar.plugins.ctc.api.measures.CtcMeasure.FileMeasureBuilder;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -38,13 +39,10 @@ import java.util.TreeMap;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.sonar.plugins.ctc.api.exceptions.CtcInvalidReportException;
-import org.sonar.plugins.ctc.api.measures.CtcMeasure;
-import org.sonar.plugins.ctc.api.measures.CtcMeasure.FileMeasureBuilder;
-
-import com.google.common.collect.AbstractIterator;
+import static org.sonar.plugins.ctc.api.parser.CtcResult.FILE_HEADER;
+import static org.sonar.plugins.ctc.api.parser.CtcResult.FILE_RESULT;
+import static org.sonar.plugins.ctc.api.parser.CtcResult.LINE_RESULT;
+import static org.sonar.plugins.ctc.api.parser.CtcResult.SECTION_SEP;
 
 public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcParser {
 

@@ -20,7 +20,6 @@
 package org.sonar.plugins.ctc.api.measures;
 
 import com.google.common.collect.Maps;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonar.api.measures.Measure;
@@ -222,6 +221,7 @@ public class CtcMeasure {
     }
   }
 
+  @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     if (source == null) {

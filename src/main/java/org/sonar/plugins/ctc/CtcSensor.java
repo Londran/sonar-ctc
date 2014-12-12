@@ -63,13 +63,13 @@ public class CtcSensor implements Sensor {
     }
 
   }
-  
+
   private Resource getValidResource(Project module, SensorContext context, CtcMeasure measure) {
-    
+
     Resource resource;
 
     java.io.File file = measure.getSOURCE();
-    
+
     if (file == null) {
       resource = module;
     } else if (!file.exists()) {
@@ -82,10 +82,10 @@ public class CtcSensor implements Sensor {
         LOG.error("File not mapped to resource!");
       }
     }
-    
+
     return resource;
   }
-  
+
   private void processMeasures(Resource resource, CtcMeasure ctcMeasures, SensorContext context) {
     LOG.debug("Saving measures to: {}", resource);
     for (Measure rawMeasure : ctcMeasures.getMEASURES()) {
@@ -98,7 +98,7 @@ public class CtcSensor implements Sensor {
   private void parseReport(CtcReport report, Project module, SensorContext context) {
     for (CtcMeasure measure : report) {
       Resource resource = getValidResource(module, context, measure);
-      
+
       if (resource != null) {
         processMeasures(resource, measure, context);
       }

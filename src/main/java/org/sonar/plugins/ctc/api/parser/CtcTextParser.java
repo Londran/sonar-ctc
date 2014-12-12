@@ -59,9 +59,7 @@ public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcPa
   private final Matcher matcher;
   private State state;
   private final CtcMeasure.ProjectMeasureBuilder projectBuilder;
-  
 
-  
   private static final int LINE_NR_GROUP = 3;
 
   private enum State {
@@ -167,7 +165,7 @@ public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcPa
       addConditions(line, bob);
     }
   }
-  
+
   private void addConditions(Entry<Integer, Set<MatchResult>> line, CtcMeasure.FileMeasureBuilder bob) {
     int lineId = line.getKey();
     LOG.trace("LineId: {}", lineId);

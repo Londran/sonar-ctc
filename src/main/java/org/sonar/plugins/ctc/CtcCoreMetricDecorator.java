@@ -94,7 +94,7 @@ public class CtcCoreMetricDecorator implements Decorator {
 
     }
   }
-  
+
   @SuppressWarnings({"rawtypes"})
   private void applyAndSaveMeasure(Metric[] entry, DecoratorContext context, Resource resource) {
     Measure ctc = context.getMeasure(entry[0]);

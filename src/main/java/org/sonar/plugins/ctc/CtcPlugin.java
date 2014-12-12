@@ -36,7 +36,7 @@ public class CtcPlugin extends SonarPlugin {
   public static final String CTC_DISABLE_SENSOR_KEY = "sonar.ctc.sensor.disabled";
   public static final String CTC_DISABLE_DECORATOR_KEY = "sonar.ctc.decorator.disabled";
   public static final String CTC_CORE_METRIC_KEY = "sonar.ctc.sensor.core_metric";
-  
+
   private static final String FALSE_LITERAL = "false";
 
   @SuppressWarnings("rawtypes")

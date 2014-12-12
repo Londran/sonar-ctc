@@ -86,7 +86,7 @@ public class CtcHtmlDecorator implements Decorator {
       LOG.debug("{} not found", file.getPath());
     }
   }
-  
+
   private void addPath(Matcher matcher, Element element) {
     String path;
     if (matcher.group(FILE_EXT_GROUP) != null) {

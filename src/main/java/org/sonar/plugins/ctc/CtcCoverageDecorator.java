@@ -31,8 +31,9 @@ import org.sonar.api.resources.Resource;
 
 public abstract class CtcCoverageDecorator implements Decorator, CoverageExtension {
 
+  private static final double WHOLE = 100.0;
   protected final Settings settings;
-  private static Logger log = LoggerFactory.getLogger(CtcCoverageDecorator.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CtcCoverageDecorator.class);
 
   public CtcCoverageDecorator(Settings settings) {
     this.settings = settings;
@@ -46,7 +47,7 @@ public abstract class CtcCoverageDecorator implements Decorator, CoverageExtensi
 
   @Override
   public void decorate(Resource resource, DecoratorContext context) {
-    log.trace("Decorating resource: {}", resource);
+    LOG.trace("Decorating resource: {}", resource);
     computeMeasure(context);
   }
 
@@ -61,7 +62,7 @@ public abstract class CtcCoverageDecorator implements Decorator, CoverageExtensi
   }
 
   private double calculateCoverage(final long uncoveredLines, final long lines) {
-    return 100.0 - ((100.0 * uncoveredLines) / lines);
+    return WHOLE - ((WHOLE * uncoveredLines) / lines);
   }
 
   @SuppressWarnings("rawtypes")

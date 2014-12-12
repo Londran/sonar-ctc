@@ -39,25 +39,33 @@ import java.util.SortedMap;
 @SuppressWarnings("rawtypes")
 public class CtcMeasure {
 
-  static Logger log = LoggerFactory.getLogger(CtcMeasure.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CtcMeasure.class);
 
-  private CtcMeasure(final File SOURCE, final Collection<Measure> collection) {
-    this.SOURCE = SOURCE;
-    this.MEASURES = collection;
-    if (SOURCE != null && !SOURCE.exists()) {
-      log.error("File {} does not exist!", SOURCE);
+  private final File source;
+  private final Collection<Measure> ctcMeasures;
+
+  private CtcMeasure(final File source, final Collection<Measure> collection) {
+    this.source = source;
+    this.ctcMeasures = collection;
+    if (source != null && !source.exists()) {
+      LOG.error("File {} does not exist!", source);
 
     }
-    if (SOURCE != null) {
-      log.trace("AbsoluteFilePath of {} : {}", SOURCE, SOURCE.getAbsolutePath());
+    if (source != null) {
+      LOG.trace("AbsoluteFilePath of {} : {}", source, source.getAbsolutePath());
     } else {
-      log.trace("PROJECTMEASURE");
+      LOG.trace("PROJECTMEASURE");
     }
 
   }
 
-  public final File SOURCE;
-  public final Collection<Measure> MEASURES;
+  public File getSOURCE() {
+    return source;
+  }
+
+  public Collection<Measure> getMEASURES() {
+    return ctcMeasures;
+  }
 
   public static class FileMeasureBuilder {
 
@@ -68,10 +76,10 @@ public class CtcMeasure {
     private SortedMap<Integer, Integer> coveredConditionsByLine = Maps.newTreeMap();
     private SortedMap<Integer, Integer> hitsByLine = Maps.newTreeMap();
 
-    public final File FILE;
+    private final File file;
 
     private FileMeasureBuilder(File file) {
-      this.FILE = file;
+      this.file = file;
     }
 
     public FileMeasureBuilder reset() {
@@ -180,14 +188,14 @@ public class CtcMeasure {
     }
 
     public CtcMeasure build() {
-      return new CtcMeasure(FILE, createMeasures());
+      return new CtcMeasure(file, createMeasures());
     }
 
     public static FileMeasureBuilder create(File file) {
       if (!file.exists()) {
-        log.error("File {} not found!", file);
+        LOG.error("File {} not found!", file);
       }
-      log.debug("Absolute Filepath: '{}'", file.getAbsolutePath());
+      LOG.debug("Absolute Filepath: '{}'", file.getAbsolutePath());
       return new FileMeasureBuilder(file);
     }
   }
@@ -216,11 +224,13 @@ public class CtcMeasure {
 
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    if (SOURCE == null)
+    if (source == null) {
       sb.append("Report Measures: ");
-    else sb.append("File ").append(SOURCE.toString()).append(" Measures: \n");
+    } else {
+      sb.append("File ").append(source.toString()).append(" Measures: \n");
+    }
 
-    for (Measure measure : MEASURES) {
+    for (Measure measure : ctcMeasures) {
       Metric metric = measure.getMetric();
       sb.append("  Metric: ").append(metric.getName()).append("\n   Value: ");
       switch (metric.getType()) {

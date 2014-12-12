@@ -36,6 +36,8 @@ public class CtcPlugin extends SonarPlugin {
   public static final String CTC_DISABLE_SENSOR_KEY = "sonar.ctc.sensor.disabled";
   public static final String CTC_DISABLE_DECORATOR_KEY = "sonar.ctc.decorator.disabled";
   public static final String CTC_CORE_METRIC_KEY = "sonar.ctc.sensor.core_metric";
+  
+  private static final String FALSE_LITERAL = "false";
 
   @SuppressWarnings("rawtypes")
   public static final List EXTENSIONS = Arrays.asList(
@@ -52,11 +54,11 @@ public class CtcPlugin extends SonarPlugin {
     PropertyDefinition.builder(CTC_REPORT_TYPE_KEY)
       .hidden().type(PropertyType.SINGLE_SELECT_LIST).options("TXT").name("CTC_REPORT_TYPE").build(),
     PropertyDefinition.builder(CTC_DISABLE_SENSOR_KEY)
-      .hidden().type(PropertyType.BOOLEAN).defaultValue("false").name("CTC_DISABLE_SENSOR").build(),
+      .hidden().type(PropertyType.BOOLEAN).defaultValue(FALSE_LITERAL).name("CTC_DISABLE_SENSOR").build(),
     PropertyDefinition.builder(CTC_DISABLE_DECORATOR_KEY)
-      .hidden().type(PropertyType.BOOLEAN).defaultValue("false").name("CTC_DISABLE_DECORATOR").build(),
+      .hidden().type(PropertyType.BOOLEAN).defaultValue(FALSE_LITERAL).name("CTC_DISABLE_DECORATOR").build(),
     PropertyDefinition.builder(CTC_CORE_METRIC_KEY)
-      .defaultValue("false").name("Core Metric").description("Should Testwell CTC++ replace the core metrics?").category("Code Coverage").subCategory("CTC++")
+      .defaultValue(FALSE_LITERAL).name("Core Metric").description("Should Testwell CTC++ replace the core metrics?").category("Code Coverage").subCategory("CTC++")
       .type(PropertyType.BOOLEAN).build()
     );
 

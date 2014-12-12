@@ -34,7 +34,7 @@ import static org.fest.assertions.Fail.fail;
 public abstract class CtcTextParserTest {
 
   private CtcTextParser testee;
-  private static Logger log = LoggerFactory.getLogger(CtcTextParserTest.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CtcTextParserTest.class);
 
   @Before
   public void setUp() throws Exception {
@@ -48,11 +48,14 @@ public abstract class CtcTextParserTest {
   @Test
   public void testHasNext() {
     try {
-      while (testee.next() != null)
-        ;
+      while (testee.next() != null) {
+        LOG.trace("Pulling testee...");
+      }
+
       fail("No Such Element not thrown!");
     } catch (NoSuchElementException e) {
       Assertions.assertThat(testee.hasNext()).isEqualTo(false);
+      LOG.debug("Exception thrown", e);
     }
 
   }
@@ -71,14 +74,14 @@ public abstract class CtcTextParserTest {
       testee.remove();
       fail("Remove shall not be supported");
     } catch (UnsupportedOperationException e) {
-
+      LOG.info("Tried to remove!");
     }
   }
 
   @Test
   public void testGetReportDetails() {
     while (testee.hasNext()) {
-      log.info("FOUND ELEMENT: {}", testee.next());
+      LOG.info("FOUND ELEMENT: {}", testee.next());
     }
   }
 

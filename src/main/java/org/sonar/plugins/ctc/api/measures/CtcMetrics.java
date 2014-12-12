@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.sonar.api.measures.Metric.DIRECTION_BETTER;
 import static org.sonar.api.measures.Metric.ValueType.DATA;
@@ -187,7 +188,7 @@ public class CtcMetrics implements Metrics {
 
   private static class ListBuilder {
 
-    private LinkedHashSet<Metric> elements;
+    private Set<Metric> elements;
 
     private ListBuilder() {
       elements = new LinkedHashSet<Metric>();

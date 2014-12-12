@@ -28,9 +28,11 @@ import static org.fest.assertions.Assertions.*;
 
 public class CtcMetricsTest {
 
+  private static final int NR_OF_METRICS = 14;
+
   private CtcMetrics testee;
 
-  public static Logger LOG = LoggerFactory.getLogger(CtcMetricsTest.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CtcMetricsTest.class);
 
   @Before
   public void setUp() throws Exception {
@@ -42,7 +44,7 @@ public class CtcMetricsTest {
     LOG.info("Starting Metrics test.");
     LOG.debug("Metrics: {}", testee.getMetrics());
     assertThat(testee.getMetrics()).doesNotHaveDuplicates()
-      .hasSize(14);
+      .hasSize(NR_OF_METRICS);
   }
 
 }

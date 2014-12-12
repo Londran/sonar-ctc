@@ -2,3 +2,5 @@
 /.classpath
 /.project
 /.settings
+/report.txt
+/sonar-project.properties

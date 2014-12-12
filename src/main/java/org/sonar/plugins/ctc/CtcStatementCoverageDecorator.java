@@ -51,16 +51,20 @@ public class CtcStatementCoverageDecorator extends CtcCoverageDecorator {
   protected Integer countElements(DecoratorContext context) {
 
     Measure measure = context.getMeasure(CtcMetrics.CTC_STATEMENTS_TO_COVER);
-    if (measure == null)
+    if (measure == null) {
       return null;
-    else return measure.getIntValue();
+    } else {
+      return measure.getIntValue();
+    }
   }
 
   @Override
   protected Integer countUncoveredElements(DecoratorContext context) {
     Measure measure = context.getMeasure(CtcMetrics.CTC_UNCOVERED_STATEMENTS);
-    if (measure == null)
+    if (measure == null) {
       return null;
-    else return measure.getIntValue();
+    } else {
+      return measure.getIntValue();
+    }
   }
 }

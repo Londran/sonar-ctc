@@ -41,51 +41,61 @@ import org.sonar.plugins.ctc.api.measures.CtcMetrics;
 
 public class CtcHtmlDecorator implements Decorator {
 
-  private static final String[] indizes = {"CTCHTML/indexF.html", "CTCHTML/indexC.html"};
+  private static final int FILE_EXT_GROUP = 2;
 
-  private final static Pattern FILE_PATTERN = Pattern.compile("\\./?([^\\.]*(\\..+)?)");
+  private static final String[] INDIZES = {"CTCHTML/indexF.html", "CTCHTML/indexC.html"};
+
+  private static final Pattern FILE_PATTERN = Pattern.compile("\\./?([^\\.]*(\\..+)?)");
 
   private Map<String, String> hrefMap;
-  public static final Logger log = LoggerFactory
+  private static final Logger LOG = LoggerFactory
     .getLogger(CtcHtmlDecorator.class);
 
   public CtcHtmlDecorator() {
-    log.info("CTCHTML_DECORATOR STARTED");
     hrefMap = new HashMap<String, String>();
+
     try {
-      for (String s : indizes) {
+      for (String s : INDIZES) {
         parseSource(new File(s));
       }
 
-      if (log.isDebugEnabled()) {
-        log.trace("Map");
+      if (LOG.isDebugEnabled()) {
+        LOG.trace("Map");
         for (Entry<String, String> entry : hrefMap.entrySet()) {
-          log.debug("Map - Entry: '{}':'{}'", entry.getKey(), entry.getValue());
+          LOG.debug("Map - Entry: '{}':'{}'", entry.getKey(), entry.getValue());
         }
       }
     } catch (IOException e) {
       hrefMap = null;
-      log.debug("HTML-Report not found");
+      LOG.debug("HTML-Report not found", e);
     }
 
   }
 
   private void parseSource(File file) throws IOException {
-    Matcher matcher = FILE_PATTERN.matcher("");
-    Source source = new Source(file);
-    for (Element element : source.getAllElements("a")) {
-      matcher.reset(element.getTextExtractor().toString());
-      if (matcher.matches()) {
-        String path;
-        if (matcher.group(2) != null) {
-          path = matcher.group(1);
-        } else {
-          path = matcher.group(1) + "/";
+    if (file.exists()) {
+      Matcher matcher = FILE_PATTERN.matcher("");
+      Source source = new Source(file);
+      for (Element element : source.getAllElements("a")) {
+        matcher.reset(element.getTextExtractor().toString());
+        if (matcher.matches()) {
+          addPath(matcher, element);
         }
-        log.trace("Adding '{}' --> '{}'", path, element.getAttributeValue("href"));
-        hrefMap.put(path, element.getAttributeValue("href"));
       }
+    } else {
+      LOG.debug("{} not found", file.getPath());
     }
+  }
+  
+  private void addPath(Matcher matcher, Element element) {
+    String path;
+    if (matcher.group(FILE_EXT_GROUP) != null) {
+      path = matcher.group(1);
+    } else {
+      path = matcher.group(1) + "/";
+    }
+    LOG.trace("Adding '{}' --> '{}'", path, element.getAttributeValue("href"));
+    hrefMap.put(path, element.getAttributeValue("href"));
   }
 
   @Override
@@ -100,7 +110,7 @@ public class CtcHtmlDecorator implements Decorator {
     if (href == null) {
       href = "index.html";
     }
-    log.trace("Mapping orig report {} --> {}", resource, href);
+    LOG.trace("Mapping orig report {} --> {}", resource, href);
     @SuppressWarnings("rawtypes")
     Measure path = new Measure(CtcMetrics.CTC_ORIG_REPORT_NAME);
     path.setData(href);

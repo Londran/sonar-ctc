@@ -43,12 +43,12 @@ import com.google.common.collect.ImmutableList;
 
 public class CtcCoreMetricDecorator implements Decorator {
 
-  private final static Logger log = LoggerFactory
+  private static final Logger LOG = LoggerFactory
     .getLogger(CtcCoreMetricDecorator.class);
 
   private final Settings settings;
   @SuppressWarnings("rawtypes")
-  private static final Metric[][] conversion = {
+  private static final Metric[][] CONV = {
     {CtcMetrics.CTC_STATEMENTS_TO_COVER, CoreMetrics.STATEMENTS},
     {CtcMetrics.CTC_CONDITIONS_TO_COVER, CoreMetrics.CONDITIONS_TO_COVER},
     {CtcMetrics.CTC_CONDITIONS_BY_LINE, CoreMetrics.CONDITIONS_BY_LINE},
@@ -88,35 +88,41 @@ public class CtcCoreMetricDecorator implements Decorator {
       context.saveMeasure(new Measure(CoreMetrics.COVERAGE_LINE_HITS_DATA).setData(KeyValueFormat.format(lineHits)).setPersistenceMode(PersistenceMode.DATABASE));
     }
 
-    for (Metric[] entry : conversion) {
-      Measure ctc = context.getMeasure(entry[0]);
-      Measure sonar = context.getMeasure(entry[1]);
+    for (Metric[] entry : CONV) {
 
-      if (sonar == null) {
-        sonar = new Measure(entry[1]);
-      }
+      applyAndSaveMeasure(entry, context, resource);
 
-      log.trace("{} -> {}", entry[0].getName(), entry[1].getName());
-      if (ctc != null) {
-        switch (entry[0].getType()) {
-          case DATA:
-            if (ctc.getData() != null)
-              sonar.setData(ctc.getData());
-            break;
-          case INT:
-            if (ctc.getIntValue() != null)
-              sonar.setIntValue(ctc.getIntValue());
-            break;
-          default:
-            log.error("Illegal Type for Core Conversion!");
-            break;
+    }
+  }
+  
+  @SuppressWarnings({"rawtypes"})
+  private void applyAndSaveMeasure(Metric[] entry, DecoratorContext context, Resource resource) {
+    Measure ctc = context.getMeasure(entry[0]);
+    Measure sonar = context.getMeasure(entry[1]);
+    switch (entry[0].getType()) {
+      case DATA:
+        if (ctc.getData() != null) {
+          sonar.setData(ctc.getData());
         }
-        log.trace("Saving Metric: {}", sonar);
-        context.saveMeasure(sonar);
-      } else {
-        log.trace("No Measures found for {} {}", resource, entry[0]);
-      }
+        break;
+      case INT:
+        if (ctc.getIntValue() != null) {
+          sonar.setIntValue(ctc.getIntValue());
+        }
+        break;
+      default:
+        LOG.error("Illegal Type for Core Conversion!");
+        break;
+    }
+    LOG.trace("Saving Metric: {}", sonar);
+    context.saveMeasure(sonar);
+    if (sonar == null) {
+      sonar = new Measure(entry[1]);
+    }
 
+    LOG.trace("{} -> {}", entry[0].getName(), entry[1].getName());
+    if (ctc == null) {
+      LOG.trace("No Measures found for {} {}", resource, entry[0]);
     }
   }
 

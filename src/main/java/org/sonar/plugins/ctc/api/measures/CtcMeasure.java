@@ -35,6 +35,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.SortedMap;
 
+/**
+ * This class represents a model of CtcMeasures
+ * 
+ * It could consist of file- or project-measures.
+ * If the source is NULL, then it consists of project measures.
+ * @author Sebastian Götzinger <goetzinger@verifysoft.com>
+ *
+ */
 @SuppressWarnings("rawtypes")
 public class CtcMeasure {
 
@@ -58,16 +66,32 @@ public class CtcMeasure {
 
   }
 
+  /**
+   * Returns the measured source-file.
+   * @return the sourcefile or null of these are project measures
+   */
   public File getSOURCE() {
     return source;
   }
-
+  
+  /**
+   * Returns the scanned measures as iterable collection
+   * @return The Ctc-Measures
+   */
   public Collection<Measure> getMEASURES() {
     return ctcMeasures;
   }
 
+  /**
+   * Builderclass for convenient CtcMeasure-Building
+   * Used for FileMeasures
+   * @author Sebastian Goetzinger <goetzinger@verifysoft.com>
+   *
+   */
   public static class FileMeasureBuilder {
-
+    /**
+     * The File-Metrics
+     */
     public static final List<Metric> METRICS = CtcMetrics.FILE_METRICS;
 
     private int totalCoveredLines = 0, totalStatements = 0, totalCoveredStatements = 0, totalConditions = 0, totalCoveredConditions = 0;
@@ -80,7 +104,10 @@ public class CtcMeasure {
     private FileMeasureBuilder(File file) {
       this.file = file;
     }
-
+    /**
+     * Resets the builder and returns itself
+     * @return the builder
+     */
     public FileMeasureBuilder reset() {
       totalStatements = 0;
       totalCoveredStatements = 0;
@@ -92,12 +119,24 @@ public class CtcMeasure {
       return this;
     }
 
+    /**
+     * Sets the Statements of this builder
+     * @param covered amount of covered statements
+     * @param statement amount of statements
+     * @return the builder
+     */
     public FileMeasureBuilder setStatememts(int covered, int statement) {
       totalStatements = statement;
       totalCoveredStatements = covered;
       return this;
     }
 
+    /**
+     * Sets the hits per Line
+     * @param lineId hitted line
+     * @param hits number of hits
+     * @return the builder
+     */
     public FileMeasureBuilder setHits(int lineId, int hits) {
       if (!hitsByLine.containsKey(lineId)) {
         hitsByLine.put(lineId, hits);
@@ -108,6 +147,13 @@ public class CtcMeasure {
       return this;
     }
 
+    /**
+     * Sets the conditions per line.
+     * @param lineId 
+     * @param conditions
+     * @param coveredConditions
+     * @return
+     */
     public FileMeasureBuilder setConditions(int lineId, int conditions, int coveredConditions) {
       if (conditions > 0 && !conditionsByLine.containsKey(lineId)) {
         totalConditions += conditions;
@@ -117,7 +163,7 @@ public class CtcMeasure {
       }
       return this;
     }
-
+    
     public int getCoveredLines() {
       return totalCoveredLines;
     }

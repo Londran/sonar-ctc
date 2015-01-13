@@ -80,7 +80,7 @@ public class CtcCoreMetricDecorator implements Decorator {
       Map lineHits = new HashMap<Integer, Integer>();
       context.saveMeasure(CoreMetrics.LINES_TO_COVER, context.getMeasure(CoreMetrics.LINES).getValue());
       context.saveMeasure(CoreMetrics.UNCOVERED_LINES, 0.0);
-
+      
       for (int i = 1; i <= context.getMeasure(CoreMetrics.LINES).getIntValue(); i++) {
         lineHits.put(i, 1);
       }
@@ -98,6 +98,18 @@ public class CtcCoreMetricDecorator implements Decorator {
   private void applyAndSaveMeasure(Metric[] entry, DecoratorContext context, Resource resource) {
     Measure ctc = context.getMeasure(entry[0]);
     Measure sonar = context.getMeasure(entry[1]);
+    if (ctc != null) {
+      applyData(entry, ctc, sonar);
+      LOG.trace("Saving Metric: {}", sonar);
+      context.saveMeasure(sonar);
+    }
+  }
+  
+  @SuppressWarnings("rawtypes")
+  private void applyData(Metric[] entry, Measure ctc, Measure sonar) {
+    if (sonar == null) {
+      sonar = new Measure(entry[1]);
+    }
     switch (entry[0].getType()) {
       case DATA:
         if (ctc.getData() != null) {
@@ -112,16 +124,6 @@ public class CtcCoreMetricDecorator implements Decorator {
       default:
         LOG.error("Illegal Type for Core Conversion!");
         break;
-    }
-    LOG.trace("Saving Metric: {}", sonar);
-    context.saveMeasure(sonar);
-    if (sonar == null) {
-      sonar = new Measure(entry[1]);
-    }
-
-    LOG.trace("{} -> {}", entry[0].getName(), entry[1].getName());
-    if (ctc == null) {
-      LOG.trace("No Measures found for {} {}", resource, entry[0]);
     }
   }
 

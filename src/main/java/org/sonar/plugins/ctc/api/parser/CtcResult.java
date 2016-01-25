@@ -31,6 +31,7 @@ public enum CtcResult {
   LIS_DTE("Listing produced at   : (.*)$"),
   COV_VIW("Coverage view         : (.*)$"),
   SRC_FLS("Source files       : (.*)$"),
+  HDR_EXT("(?:Headers extracted  : .*$)?"),
   SRC_LNS("Source lines       : (.*)$"),
   MEA_PTS("Measurement points : (.*)$"),
   FILE_MONI("MONITORED (?:.*) FILE : (.*)$"),
@@ -40,7 +41,7 @@ public enum CtcResult {
 
   public static final Pattern REPORT_HEADER = Pattern.compile(MON_SYM.patternString + "\\s+" + MON_DAT.patternString
     + "\\s+" + LIS_DTE.patternString + "\\s+" + COV_VIW.patternString, MULTILINE);
-  public static final Pattern REPORT_FOOTER = Pattern.compile(SRC_FLS.patternString + "\\s+" + SRC_LNS.patternString
+  public static final Pattern REPORT_FOOTER = Pattern.compile(SRC_FLS.patternString + "\\s+" + HDR_EXT.patternString + "\\s+" + SRC_LNS.patternString
     + "\\s+" + MEA_PTS.patternString, MULTILINE);
   public static final Pattern FILE_HEADER = Pattern.compile(FILE_MONI.patternString + "\\s+" + FILE_INST.patternString, MULTILINE);
   public static final Pattern SECTION_SEP = compile("^-{77}|={77}$", MULTILINE);

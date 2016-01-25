@@ -119,6 +119,7 @@ SUMMARY
 =======
 
 Source files       : 3
+Headers extracted  : 0
 Source lines       : 82
 Measurement points : 31
 TER                : 82 % (27/33) multicondition

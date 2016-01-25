@@ -99,6 +99,7 @@ public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcPa
   }
 
   private CtcMeasure parseUnit() {
+	  LOG.info(matcher.toString());
     if (matcher.usePattern(FILE_HEADER).find(FROM_START)) {
       return parseFileUnit();
     } else if (matcher.usePattern(CtcResult.REPORT_FOOTER).find(FROM_START)) {

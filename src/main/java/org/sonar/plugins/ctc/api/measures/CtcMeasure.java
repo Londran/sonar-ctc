@@ -94,10 +94,10 @@ public class CtcMeasure {
      */
     public static final List<Metric> METRICS = CtcMetrics.FILE_METRICS;
 
-    private int totalCoveredLines = 0, totalStatements = 0, totalCoveredStatements = 0, totalConditions = 0, totalCoveredConditions = 0;
-    private SortedMap<Integer, Integer> conditionsByLine = Maps.newTreeMap();
-    private SortedMap<Integer, Integer> coveredConditionsByLine = Maps.newTreeMap();
-    private SortedMap<Integer, Integer> hitsByLine = Maps.newTreeMap();
+    private long totalCoveredLines = 0, totalStatements = 0, totalCoveredStatements = 0, totalConditions = 0, totalCoveredConditions = 0;
+    private SortedMap<Long, Long> conditionsByLine = Maps.newTreeMap();
+    private SortedMap<Long, Long> coveredConditionsByLine = Maps.newTreeMap();
+    private SortedMap<Long, Long> hitsByLine = Maps.newTreeMap();
 
     private final File file;
 
@@ -125,7 +125,7 @@ public class CtcMeasure {
      * @param statement amount of statements
      * @return the builder
      */
-    public FileMeasureBuilder setStatememts(int covered, int statement) {
+    public FileMeasureBuilder setStatememts(long covered, long statement) {
       totalStatements = statement;
       totalCoveredStatements = covered;
       return this;
@@ -137,7 +137,7 @@ public class CtcMeasure {
      * @param hits number of hits
      * @return the builder
      */
-    public FileMeasureBuilder setHits(int lineId, int hits) {
+    public FileMeasureBuilder setHits(long lineId, long hits) {
       if (!hitsByLine.containsKey(lineId)) {
         hitsByLine.put(lineId, hits);
         if (hits > 0) {
@@ -154,7 +154,7 @@ public class CtcMeasure {
      * @param coveredConditions
      * @return
      */
-    public FileMeasureBuilder setConditions(int lineId, int conditions, int coveredConditions) {
+    public FileMeasureBuilder setConditions(long lineId, long conditions, long coveredConditions) {
       if (conditions > 0 && !conditionsByLine.containsKey(lineId)) {
         totalConditions += conditions;
         totalCoveredConditions += coveredConditions;
@@ -164,7 +164,7 @@ public class CtcMeasure {
       return this;
     }
     
-    public int getCoveredLines() {
+    public long getCoveredLines() {
       return totalCoveredLines;
     }
 
@@ -172,31 +172,31 @@ public class CtcMeasure {
       return hitsByLine.size();
     }
 
-    public SortedMap<Integer, Integer> getHitsByLine() {
+    public SortedMap<Long, Long> getHitsByLine() {
       return Collections.unmodifiableSortedMap(hitsByLine);
     }
 
-    public int getCoveredStatements() {
+    public long getCoveredStatements() {
       return totalCoveredStatements;
     }
 
-    public int getStatements() {
+    public long getStatements() {
       return totalStatements;
     }
 
-    public int getConditions() {
+    public long getConditions() {
       return totalConditions;
     }
 
-    public int getCoveredConditions() {
+    public long getCoveredConditions() {
       return totalCoveredConditions;
     }
 
-    public SortedMap<Integer, Integer> getConditionsByLine() {
+    public SortedMap<Long, Long> getConditionsByLine() {
       return Collections.unmodifiableSortedMap(conditionsByLine);
     }
 
-    public SortedMap<Integer, Integer> getCoveredConditionsByLine() {
+    public SortedMap<Long, Long> getCoveredConditionsByLine() {
       return Collections.unmodifiableSortedMap(coveredConditionsByLine);
     }
 
@@ -247,9 +247,9 @@ public class CtcMeasure {
 
   public static class ProjectMeasureBuilder {
 
-    int measurePoints = 0;
+    long measurePoints = 0;
 
-    public ProjectMeasureBuilder setMeasurePoints(int mp) {
+    public ProjectMeasureBuilder setMeasurePoints(long mp) {
       measurePoints = mp;
       return this;
     }

@@ -29,6 +29,7 @@ import org.sonar.plugins.ctc.api.measures.CtcMeasure.FileMeasureBuilder;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -128,20 +129,20 @@ public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcPa
     return bob.build();
   }
 
-  private void addEachLine(Map<Integer, Set<MatchResult>> buffer) {
+  private void addEachLine(Map<Long, Set<MatchResult>> buffer) {
     do {
-      int last = Integer.parseInt(matcher.group(LINE_NR_GROUP));
+      long last = Long.parseLong(matcher.group(LINE_NR_GROUP));
       Set<MatchResult> line = buffer.get(last);
       if (line == null) {
         line = new HashSet<MatchResult>();
-        buffer.put(Integer.parseInt(matcher.group(LINE_NR_GROUP)), line);
+        buffer.put(Long.parseLong(matcher.group(LINE_NR_GROUP)), line);
       }
       LOG.trace("Added line: {}", matcher.toMatchResult());
       line.add(matcher.toMatchResult());
     } while (matcher.find());
   }
 
-  private void parseLineSection(Map<Integer, Set<MatchResult>> buffer) {
+  private void parseLineSection(Map<Long, Set<MatchResult>> buffer) {
     LOG.trace("Found linesection...");
     if (matcher.usePattern(LINE_RESULT).find(FROM_START)) {
       addEachLine(buffer);
@@ -155,27 +156,27 @@ public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcPa
 
   private void addLines(CtcMeasure.FileMeasureBuilder bob) throws NoSuchElementException {
     LOG.trace("Adding lines...");
-    Map<Integer, Set<MatchResult>> buffer = new TreeMap<Integer, Set<MatchResult>>();
+    Map<Long, Set<MatchResult>> buffer = new TreeMap<Long, Set<MatchResult>>();
     while (!matcher.reset(scanner.next()).usePattern(FILE_RESULT).find()) {
       parseLineSection(buffer);
     }
     LOG.trace("Found matches: {}", buffer);
-    for (Entry<Integer, Set<MatchResult>> line : buffer.entrySet()) {
+    for (Entry<Long, Set<MatchResult>> line : buffer.entrySet()) {
       addConditions(line, bob);
     }
   }
 
-  private void addConditions(Entry<Integer, Set<MatchResult>> line, CtcMeasure.FileMeasureBuilder bob) {
-    int lineId = line.getKey();
+  private void addConditions(Entry<Long, Set<MatchResult>> line, CtcMeasure.FileMeasureBuilder bob) {
+    long lineId = line.getKey();
     LOG.trace("LineId: {}", lineId);
-    int conditions = 0;
-    int coveredConditions = 0;
+    long conditions = 0;
+    long coveredConditions = 0;
     for (MatchResult result : line.getValue()) {
       String s = result.group(FALSE_CONDS);
 
       if (s != null) {
         conditions++;
-        if (Integer.parseInt(s) > 0) {
+        if (new BigDecimal(s).longValueExact() > 0) {
           coveredConditions++;
         }
       }
@@ -183,7 +184,7 @@ public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcPa
 
       if (s != null) {
         conditions++;
-        if (Integer.parseInt(s) > 0) {
+        if (new BigDecimal(s).longValueExact() > 0) {
           coveredConditions++;
         }
       }
@@ -195,8 +196,8 @@ public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcPa
 
   private void addStatements(CtcMeasure.FileMeasureBuilder bob) {
     try {
-      int covered = Integer.parseInt(matcher.group(STMNT_COVERED_GROUP));
-      int statement = Integer.parseInt(matcher.group(STMNT_TO_COVER_GROUP));
+      long covered = Long.parseLong(matcher.group(STMNT_COVERED_GROUP));
+      long statement = Long.parseLong(matcher.group(STMNT_TO_COVER_GROUP));
       bob.setStatememts(covered, statement);
       LOG.trace("Statements: {}/{}", covered, statement);
     } catch (NumberFormatException e) {
@@ -206,9 +207,9 @@ public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcPa
   }
 
   private void parseReportUnit() {
-    int mp = 0;
+    long mp = 0;
     try {
-      mp = Integer.parseInt(matcher.group(MP_GROUP));
+      mp = Long.parseLong(matcher.group(MP_GROUP));
     } catch (NumberFormatException e) {
       LOG.error("Could not parse '{}' to Integer", matcher.group(MP_GROUP));
       LOG.trace("Whole Group: {}", matcher.group(WHOLE_GROUP));

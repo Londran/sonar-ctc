@@ -99,8 +99,8 @@ INSTRUMENTATION MODE  : multicondition
         89 % (  8/  9) statement
 -----------------------------------------------------------------------------
 
-         9                 30 FUNCTION io::test()
-         4          5      32   if (Calc . isPrime ( value ))
+9147483647                 30 FUNCTION io::test()
+13094967E3          5      32   if (Calc . isPrime ( value ))
                            34   else
                            36 }
 

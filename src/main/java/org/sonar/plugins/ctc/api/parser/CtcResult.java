@@ -37,7 +37,7 @@ public enum CtcResult {
   FILE_MONI("MONITORED (?:.*) FILE : (.*)$"),
   FILE_INST("INSTRUMENTATION MODE  : (.*)$"),
   FILE_COND("^\\Q***TER\\E +\\d+ % \\( *(\\d+)/ *(\\d+)\\) of FILE (?:.*)$"),
-  FILE_STMT("^ {6} +\\d+ % \\( *(\\d+)/ *(\\d+)\\) statement$");
+  FILE_STMT("^ {6} +\\d+ % \\( *(\\d+)/ *(\\d+)\\) statement.*$");
 
   public static final Pattern REPORT_HEADER = Pattern.compile(MON_SYM.patternString + "\\s+" + MON_DAT.patternString
     + "\\s+" + LIS_DTE.patternString + "\\s+" + COV_VIW.patternString, MULTILINE);

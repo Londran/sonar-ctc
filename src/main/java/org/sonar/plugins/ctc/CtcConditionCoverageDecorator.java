@@ -19,15 +19,11 @@
  */
 package org.sonar.plugins.ctc;
 
-import com.google.common.collect.ImmutableList;
-import org.sonar.api.batch.DecoratorContext;
-import org.sonar.api.batch.DependsUpon;
+import org.sonar.api.ce.measure.MeasureComputer.MeasureComputerContext;
 import org.sonar.api.config.Settings;
-import org.sonar.api.measures.Measure;
+import org.sonar.api.ce.measure.Measure;
 import org.sonar.api.measures.Metric;
 import org.sonar.plugins.ctc.api.measures.CtcMetrics;
-
-import java.util.List;
 
 @SuppressWarnings("rawtypes")
 public class CtcConditionCoverageDecorator extends CtcCoverageDecorator {
@@ -36,9 +32,13 @@ public class CtcConditionCoverageDecorator extends CtcCoverageDecorator {
     super(settings);
   }
 
-  @DependsUpon
-  public List<Metric> dependsUponMetrics() {
-    return ImmutableList.<Metric>of(CtcMetrics.CTC_UNCOVERED_CONDITIONS, CtcMetrics.CTC_CONDITIONS_TO_COVER);
+  @Override
+  public MeasureComputerDefinition define(MeasureComputerDefinitionContext def) {
+    return def.newDefinitionBuilder()
+      .setOutputMetrics(CtcMetrics.CTC_CONDITION_COVERAGE.key())
+      .setInputMetrics(CtcMetrics.CTC_UNCOVERED_CONDITIONS.key(),
+        CtcMetrics.CTC_CONDITIONS_TO_COVER.key())
+      .build();
   }
 
   @Override
@@ -47,8 +47,8 @@ public class CtcConditionCoverageDecorator extends CtcCoverageDecorator {
   }
 
   @Override
-  protected Integer countElements(DecoratorContext context) {
-    Measure measure = context.getMeasure(CtcMetrics.CTC_CONDITIONS_TO_COVER);
+  protected Integer countElements(MeasureComputerContext context) {
+    Measure measure = context.getMeasure(CtcMetrics.CTC_CONDITIONS_TO_COVER.key());
     if (measure == null) {
       return null;
     } else {
@@ -57,8 +57,8 @@ public class CtcConditionCoverageDecorator extends CtcCoverageDecorator {
   }
 
   @Override
-  protected Integer countUncoveredElements(DecoratorContext context) {
-    Measure measure = context.getMeasure(CtcMetrics.CTC_UNCOVERED_CONDITIONS);
+  protected Integer countUncoveredElements(MeasureComputerContext context) {
+    Measure measure = context.getMeasure(CtcMetrics.CTC_UNCOVERED_CONDITIONS.key());
     if (measure == null) {
       return null;
     } else {

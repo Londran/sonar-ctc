@@ -27,7 +27,7 @@ public class CtcInvalidReportException extends RuntimeException {
   private static final long serialVersionUID = 1L;
 
   public CtcInvalidReportException() {
-    this("");
+    this("CtcInvalidReportException");
   }
 
   public CtcInvalidReportException(String msg) {

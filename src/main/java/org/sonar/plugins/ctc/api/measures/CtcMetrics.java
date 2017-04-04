@@ -51,7 +51,7 @@ public class CtcMetrics implements Metrics {
     .create();
 
   public static final String CTC_UNCOVERED_STATEMENTS_KEY = "ctc_uncovered_statements";
-  public static final Metric<Integer> CTC_UNCOVERED_STATEMENTS = new Builder(CTC_UNCOVERED_STATEMENTS_KEY, "CTC++ uncovered statements", INT)
+  public static final Metric<Integer> CTC_UNCOVERED_STATEMENTS = new Builder(CTC_UNCOVERED_STATEMENTS_KEY, "CTC++ statements uncovered", INT)
     .setDescription("Uncovered statements by all tests")
     .setDirection(Metric.DIRECTION_WORST)
     .setQualitative(false)
@@ -76,7 +76,7 @@ public class CtcMetrics implements Metrics {
     .create();
 
   public static final String CTC_UNCOVERED_CONDITIONS_KEY = "ctc_uncovered_conditions";
-  public static final Metric<Integer> CTC_UNCOVERED_CONDITIONS = new Builder(CTC_UNCOVERED_CONDITIONS_KEY, "CTC++ uncovered conditions", INT)
+  public static final Metric<Integer> CTC_UNCOVERED_CONDITIONS = new Builder(CTC_UNCOVERED_CONDITIONS_KEY, "CTC++ conditions uncovered", INT)
     .setDescription("Uncovered conditions by all tests")
     .setDirection(Metric.DIRECTION_WORST)
     .setDomain(DOMAIN_CTC_TEST)

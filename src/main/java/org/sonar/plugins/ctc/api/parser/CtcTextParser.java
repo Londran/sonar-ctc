@@ -25,7 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonar.plugins.ctc.api.exceptions.CtcInvalidReportException;
 import org.sonar.plugins.ctc.api.measures.CtcMeasure;
-import org.sonar.plugins.ctc.api.measures.CtcMeasure.FileMeasureBuilder;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -57,7 +56,7 @@ public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcPa
   private final Scanner scanner;
   private final Matcher matcher;
   private State state;
-  private final CtcMeasure.ProjectMeasureBuilder projectBuilder;
+  private final CtcMeasure projectBuilder;
 
   private static final int LINE_NR_GROUP = 3;
 
@@ -73,7 +72,7 @@ public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcPa
     scanner = new Scanner(report).useDelimiter(SECTION_SEP);
     matcher = CtcResult.FILE_HEADER.matcher("");
     state = State.BEGIN;
-    projectBuilder = new CtcMeasure.ProjectMeasureBuilder();
+    projectBuilder = new CtcMeasure(null);
   }
 
   @Override
@@ -117,7 +116,7 @@ public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcPa
 
   private CtcMeasure parseFileUnit() {
     File file = new File("./" + matcher.group(1));
-    CtcMeasure.FileMeasureBuilder bob = FileMeasureBuilder.create(file);
+    CtcMeasure bob = new CtcMeasure(file);
     try {
       addLines(bob);
     } catch (NoSuchElementException e) {
@@ -154,7 +153,7 @@ public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcPa
     }
   }
 
-  private void addLines(CtcMeasure.FileMeasureBuilder bob) throws NoSuchElementException {
+  private void addLines(CtcMeasure bob) throws NoSuchElementException {
     LOG.trace("Adding lines...");
     Map<Long, Set<MatchResult>> buffer = new TreeMap<Long, Set<MatchResult>>();
     while (!matcher.reset(scanner.next()).usePattern(FILE_RESULT).find()) {
@@ -163,10 +162,22 @@ public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcPa
     LOG.trace("Found matches: {}", buffer);
     for (Entry<Long, Set<MatchResult>> line : buffer.entrySet()) {
       addConditions(line, bob);
+      addLineHit(line, bob);
     }
   }
+  
+  private void addLineHit(Entry<Long, Set<MatchResult>> line, CtcMeasure bob) {
+    long lineId = line.getKey();
+    for (MatchResult result : line.getValue()) {
+      String s = result.group(FALSE_CONDS);
+      if (s != null) {
+        bob.setHits(lineId, 1);
+      }
+    }
+    
+  }
 
-  private void addConditions(Entry<Long, Set<MatchResult>> line, CtcMeasure.FileMeasureBuilder bob) {
+  private void addConditions(Entry<Long, Set<MatchResult>> line, CtcMeasure bob) {
     long lineId = line.getKey();
     LOG.trace("LineId: {}", lineId);
     long conditions = 0;
@@ -191,10 +202,9 @@ public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcPa
     }
     LOG.trace("Conditioncoverage: {}/{}", coveredConditions, conditions);
     bob.setConditions(lineId, conditions, coveredConditions);
-
   }
 
-  private void addStatements(CtcMeasure.FileMeasureBuilder bob) {
+  private void addStatements(CtcMeasure bob) {
     try {
       long covered = Long.parseLong(matcher.group(STMNT_COVERED_GROUP));
       long statement = Long.parseLong(matcher.group(STMNT_TO_COVER_GROUP));

@@ -36,8 +36,8 @@ public class CtcConditionCoverageDecorator extends CtcCoverageDecorator {
   public MeasureComputerDefinition define(MeasureComputerDefinitionContext def) {
     return def.newDefinitionBuilder()
       .setOutputMetrics(CtcMetrics.CTC_CONDITION_COVERAGE.key())
-      .setInputMetrics(CtcMetrics.CTC_UNCOVERED_CONDITIONS.key(),
-        CtcMetrics.CTC_CONDITIONS_TO_COVER.key())
+      .setInputMetrics( CtcMetrics.CTC_UNCOVERED_CONDITIONS.key(),
+                        CtcMetrics.CTC_CONDITIONS_TO_COVER.key())
       .build();
   }
 

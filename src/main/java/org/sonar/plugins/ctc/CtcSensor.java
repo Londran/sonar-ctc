@@ -25,17 +25,16 @@ import org.sonar.api.batch.sensor.Sensor;
 import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.batch.sensor.SensorDescriptor;
 import org.sonar.api.config.Settings;
-import org.sonar.api.measures.Measure;
 import org.sonar.plugins.ctc.api.measures.CtcMeasure;
 import org.sonar.plugins.ctc.api.measures.CtcReport;
 import org.sonar.plugins.ctc.api.measures.CtcTextReport;
-import org.sonar.api.measures.CoreMetrics;
 import org.sonar.api.batch.fs.InputFile;
-import org.sonar.api.measures.Metric;
 import java.util.Map;
-import java.util.HashMap;
-import java.util.Collections;
+import java.util.SortedMap;
 import org.sonar.plugins.ctc.api.measures.CtcMetrics;
+import org.sonar.api.batch.sensor.coverage.CoverageType;
+import org.sonar.api.batch.sensor.coverage.NewCoverage;
+import org.sonar.api.measures.CoreMetrics;
 
 @SuppressWarnings("rawtypes")
 public class CtcSensor implements Sensor {
@@ -43,24 +42,6 @@ public class CtcSensor implements Sensor {
   private static final Logger LOG = LoggerFactory.getLogger(CtcSensor.class);
 
   private Settings settings;
-
-  private static final Map<String, Metric> MAPPING_CTC_CORE_METRICS = createMap();
-
-  private static Map<String, Metric> createMap() {
-    Map<String, Metric> result = new HashMap<String, Metric>();
-
-    result.put(CtcMetrics.CTC_LINES_TO_COVER.key(), CoreMetrics.LINES_TO_COVER);
-    result.put(CtcMetrics.CTC_UNCOVERED_LINES.key(), CoreMetrics.UNCOVERED_LINES);
-    result.put(CtcMetrics.CTC_LINE_COVERAGE.key(), CoreMetrics.LINE_COVERAGE);
-
-    result.put(CtcMetrics.CTC_CONDITIONS_TO_COVER.key(), CoreMetrics.CONDITIONS_TO_COVER);
-    result.put(CtcMetrics.CTC_UNCOVERED_CONDITIONS.key(), CoreMetrics.UNCOVERED_CONDITIONS);
-
-    result.put(CtcMetrics.CTC_CONDITIONS_BY_LINE.key(), CoreMetrics.CONDITIONS_BY_LINE);
-    result.put(CtcMetrics.CTC_COVERED_CONDITIONS_BY_LINE.key(), CoreMetrics.COVERED_CONDITIONS_BY_LINE);
-
-    return Collections.unmodifiableMap(result);
-  }
 
   public CtcSensor(Settings settings) {
     this.settings = settings;
@@ -91,105 +72,74 @@ public class CtcSensor implements Sensor {
 
   private void processMeasures(CtcMeasure ctcMeasures, SensorContext sensorContext) {
 
-    Metric ctcMetric;
-    Metric coreMetric;
-    boolean setCoreMetrics;
-
-    setCoreMetrics = this.settings.getBoolean(CtcPlugin.CTC_CORE_METRIC_KEY);
+    SortedMap<Long, Long> hitsByLine;
+    SortedMap<Long, Long> conditionsByLine;
+    SortedMap<Long, Long> coveredConditionsByLine;
 
     java.io.File myFile = ctcMeasures.getSOURCE();
     if (myFile != null) {
-      String componentPath = myFile.toString();
-      org.sonar.api.batch.fs.FilePredicate fp = sensorContext.fileSystem().predicates().hasPath(componentPath);
-      InputFile coveredFile = sensorContext.fileSystem().inputFile(fp);
+      String filePath = myFile.toString();
+      InputFile coveredFile = sensorContext.fileSystem().inputFile(sensorContext.fileSystem().predicates().hasPath(filePath));
       if (coveredFile != null) {
-        LOG.debug("File mapped to {}", componentPath);
-        for (Measure rawMeasure : ctcMeasures.getMEASURES()) {
-          ctcMetric = rawMeasure.getMetric();
-          coreMetric = setCoreMetrics == true ? MAPPING_CTC_CORE_METRICS.get(ctcMetric.getKey()) : null;
-          LOG.debug("ctcMetric {} {}", ctcMetric.key(), rawMeasure.toString());
-          switch (ctcMetric.getType()) {
-            case DATA:
-              sensorContext.<String>newMeasure()
-                .forMetric(ctcMetric)
-                .on(coveredFile)
-                .withValue(rawMeasure.getData())
-                .save();
-              if (null != coreMetric) {
-                sensorContext.<String>newMeasure()
-                  .forMetric(coreMetric)
-                  .on(coveredFile)
-                  .withValue(rawMeasure.getData())
-                  .save();
-              }
-              break;
-            case FLOAT:
-              sensorContext.<Float>newMeasure()
-                .forMetric(ctcMetric)
-                .on(coveredFile)
-                .withValue(rawMeasure.getValue())
-                .save();
-              if (null != coreMetric) {
-                sensorContext.<Float>newMeasure()
-                  .forMetric(coreMetric)
-                  .on(coveredFile)
-                  .withValue(rawMeasure.getValue())
-                  .save();
-              }
-              break;
-            case INT:
-              sensorContext.<Integer>newMeasure()
-                .forMetric(ctcMetric)
-                .on(coveredFile)
-                .withValue(rawMeasure.getIntValue())
-                .save();
-              if (null != coreMetric) {
-                sensorContext.<Integer>newMeasure()
-                  .forMetric(coreMetric)
-                  .on(coveredFile)
-                  .withValue(rawMeasure.getIntValue())
-                  .save();
-              }
-              break;
-            case MILLISEC:
-              break;
-            case PERCENT:
-              sensorContext.<Double>newMeasure()
-                .forMetric(ctcMetric)
-                .on(coveredFile)
-                .withValue(rawMeasure.toString())
-                .save();
-              if (null != coreMetric) {
-                sensorContext.<Double>newMeasure()
-                  .forMetric(coreMetric)
-                  .on(coveredFile)
-                  .withValue(rawMeasure.toString())
-                  .save();
-              }
-              break;
-            default:
-              LOG.error("Illegal Measure Type!");
-              break;
-          }
+        
+        //CoreMetrics
+        
+        NewCoverage newCoverage = sensorContext.newCoverage().onFile(coveredFile).ofType(CoverageType.UNIT);
+        
+        hitsByLine = ctcMeasures.getHitsByLine();
+        for (Map.Entry<Long, Long> entry : hitsByLine.entrySet()) {
+          newCoverage.lineHits(entry.getKey().intValue(), entry.getValue().intValue());
         }
+        
+        conditionsByLine = ctcMeasures.getConditionsByLine();
+        coveredConditionsByLine = ctcMeasures.getCoveredConditionsByLine();
+        for (Map.Entry<Long, Long> entry : conditionsByLine.entrySet()) {
+          newCoverage.conditions(entry.getKey().intValue(), entry.getValue().intValue(), coveredConditionsByLine.get(entry.getKey()).intValue());
+        }
+        newCoverage.save();
+        
+        if (ctcMeasures.getStatements() > 0) {
+          sensorContext.<Integer>newMeasure()
+            .forMetric(CtcMetrics.CTC_STATEMENTS_TO_COVER)
+            .on(coveredFile)
+            .withValue((int)(ctcMeasures.getStatements()))
+            .save();
+
+          sensorContext.<Integer>newMeasure()
+            .forMetric(CtcMetrics.CTC_UNCOVERED_STATEMENTS)
+            .on(coveredFile)
+            .withValue((int)(ctcMeasures.getStatements() - ctcMeasures.getCoveredStatements()))
+            .save();
+        }
+        
+        if (ctcMeasures.getStatements() > 0) {
+          sensorContext.<Integer>newMeasure()
+            .forMetric(CtcMetrics.CTC_CONDITIONS_TO_COVER)
+            .on(coveredFile)
+            .withValue((int)(ctcMeasures.getConditions()))
+            .save();
+
+          sensorContext.<Integer>newMeasure()
+            .forMetric(CtcMetrics.CTC_UNCOVERED_CONDITIONS)
+            .on(coveredFile)
+            .withValue((int)(ctcMeasures.getConditions() - ctcMeasures.getCoveredConditions()))
+            .save();
+        }
+        
       } else {
-        LOG.error("File not mapped to resource! ({})", componentPath);
+        LOG.error("File not mapped to resource! ({})", filePath);
       }
+    } else {
+      sensorContext.<Integer>newMeasure()
+        .forMetric(CtcMetrics.CTC_MEASURE_POINTS)
+        .on(sensorContext.module())
+        .withValue((int)ctcMeasures.getMeasurePoints())
+        .save();
     }
   }
 
+
   private void parseReport(CtcReport report, SensorContext sensorContext) {
-    /*
-      FileSystem fileSystem = sensorContext.fileSystem();
-      FilePredicate mainFilePredicate = fileSystem.predicates().and(
-            fileSystem.predicates().hasType(InputFile.Type.MAIN),
-            fileSystem.predicates().hasLanguage("c++"));
-
-      for (InputFile inputFile : sensorContext.fileSystem().inputFiles(mainFilePredicate)){
-            LOG.debug("inputFile {}", inputFile.toString());
-      }
-     */
-
     for (CtcMeasure measure : report) {
       processMeasures(measure, sensorContext);
     }

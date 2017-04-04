@@ -22,22 +22,17 @@ package org.sonar.plugins.ctc.api.measures;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonar.api.measures.Measure;
-import org.sonar.api.measures.Metric;
 
 import java.io.File;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.SortedMap;
 
 /**
  * This class represents a model of CtcMeasures
- * 
- * It could consist of file- or project-measures.
- * If the source is NULL, then it consists of project measures.
+ *
+ * It could consist of file- or project-measures. If the source is NULL, then it
+ * consists of project measures.
+ *
  * @author Sebastian Götzinger <goetzinger@verifysoft.com>
  *
  */
@@ -47,6 +42,14 @@ public class CtcMeasure {
   private static final Logger LOG = LoggerFactory.getLogger(CtcMeasure.class);
 
   private final File source;
+
+  /**
+   * The File-Metrics
+   */
+  private long totalCoveredLines = 0, totalStatements = 0, totalCoveredStatements = 0, totalConditions = 0, totalCoveredConditions = 0, measurePoints = 0;
+  private final SortedMap<Long, Long> conditionsByLine = Maps.newTreeMap();
+  private final SortedMap<Long, Long> coveredConditionsByLine = Maps.newTreeMap();
+  private final SortedMap<Long, Long> hitsByLine = Maps.newTreeMap();
 
   public CtcMeasure(final File source) {
     this.source = source;
@@ -64,140 +67,115 @@ public class CtcMeasure {
 
   /**
    * Returns the measured source-file.
+   *
    * @return the sourcefile or null of these are project measures
    */
-  public File getSOURCE() {
+  public File getSource() {
     return source;
   }
-  
+
   /**
-   * Builderclass for convenient CtcMeasure-Building
-   * Used for FileMeasures
-   * @author Sebastian Goetzinger <goetzinger@verifysoft.com>
-   *
+   * Resets the builder and returns itself
    */
+  public void reset() {
+    totalStatements = 0;
+    totalCoveredStatements = 0;
+    totalConditions = 0;
+    totalCoveredConditions = 0;
+    totalCoveredLines = 0;
+    conditionsByLine.clear();
+    coveredConditionsByLine.clear();
+  }
 
-    /**
-     * The File-Metrics
-     */
-    public static final List<Metric> METRICS = CtcMetrics.FILE_METRICS;
+  /**
+   * Sets the Statements of this builder
+   *
+   * @param covered amount of covered statements
+   * @param statement amount of statements
+   */
+  public void setStatememts(long covered, long statement) {
+    totalCoveredStatements = covered;
+    totalStatements = statement;
+  }
 
-    private long totalCoveredLines = 0, totalStatements = 0, totalCoveredStatements = 0, totalConditions = 0, totalCoveredConditions = 0;
-    private SortedMap<Long, Long> conditionsByLine = Maps.newTreeMap();
-    private SortedMap<Long, Long> coveredConditionsByLine = Maps.newTreeMap();
-    private SortedMap<Long, Long> hitsByLine = Maps.newTreeMap();
-
-    
-
-
-    /**
-     * Resets the builder and returns itself
-     */
-    public void reset() {
-      totalStatements = 0;
-      totalCoveredStatements = 0;
-      totalConditions = 0;
-      totalCoveredConditions = 0;
-      totalCoveredLines = 0;
-      conditionsByLine.clear();
-      coveredConditionsByLine.clear();
-    }
-
-    /**
-     * Sets the Statements of this builder
-     * @param covered amount of covered statements
-     * @param statement amount of statements
-     */
-    public void setStatememts(long covered, long statement) {
-      totalCoveredStatements = covered;
-      totalStatements = statement;
-    }
-
-    /**
-     * Sets the hits per Line
-     * @param lineId hitted line
-     * @param hits number of hits
-     */
-    public void setHits(long lineId, long hits) {
-      if (!hitsByLine.containsKey(lineId)) {
-        hitsByLine.put(lineId, hits);
-        if (hits > 0) {
-          totalCoveredLines += 1;
-        }
+  /**
+   * Sets the hits per Line
+   *
+   * @param lineId hitted line
+   * @param hits number of hits
+   */
+  public void setHits(long lineId, long hits) {
+    if (!hitsByLine.containsKey(lineId)) {
+      hitsByLine.put(lineId, hits);
+      if (hits > 0) {
+        totalCoveredLines += 1;
       }
     }
+  }
 
-    /**
-     * Sets the conditions per line.
-     * @param lineId 
-     * @param conditions
-     * @param coveredConditions
-     */
-    public void setConditions(long lineId, long conditions, long coveredConditions) {
-      if (conditions > 0 && !conditionsByLine.containsKey(lineId)) {
-        totalConditions += conditions;
-        totalCoveredConditions += coveredConditions;
-        conditionsByLine.put(lineId, conditions);
-        coveredConditionsByLine.put(lineId, coveredConditions);
-      }
+  /**
+   * Sets the conditions per line.
+   *
+   * @param lineId
+   * @param conditions
+   * @param coveredConditions
+   */
+  public void setConditions(long lineId, long conditions, long coveredConditions) {
+    if (conditions > 0 && !conditionsByLine.containsKey(lineId)) {
+      totalConditions += conditions;
+      totalCoveredConditions += coveredConditions;
+      conditionsByLine.put(lineId, conditions);
+      coveredConditionsByLine.put(lineId, coveredConditions);
     }
-    
-    public long getCoveredLines() {
-      return totalCoveredLines;
-    }
+  }
 
-    public int getLinesToCover() {
-      return hitsByLine.size();
-    }
+  public long getCoveredLines() {
+    return totalCoveredLines;
+  }
 
-    public SortedMap<Long, Long> getHitsByLine() {
-      return Collections.unmodifiableSortedMap(hitsByLine);
-    }
+  public int getLinesToCover() {
+    return hitsByLine.size();
+  }
 
-    public long getCoveredStatements() {
-      return totalCoveredStatements;
-    }
+  public SortedMap<Long, Long> getHitsByLine() {
+    return Collections.unmodifiableSortedMap(hitsByLine);
+  }
 
-    public long getStatements() {
-      return totalStatements;
-    }
+  public long getCoveredStatements() {
+    return totalCoveredStatements;
+  }
 
-    public long getConditions() {
-      return totalConditions;
-    }
+  public long getStatements() {
+    return totalStatements;
+  }
 
-    public long getCoveredConditions() {
-      return totalCoveredConditions;
-    }
+  public long getConditions() {
+    return totalConditions;
+  }
 
-    public SortedMap<Long, Long> getConditionsByLine() {
-      return Collections.unmodifiableSortedMap(conditionsByLine);
-    }
+  public long getCoveredConditions() {
+    return totalCoveredConditions;
+  }
 
-    public SortedMap<Long, Long> getCoveredConditionsByLine() {
-      return Collections.unmodifiableSortedMap(coveredConditionsByLine);
-    }
+  public SortedMap<Long, Long> getConditionsByLine() {
+    return Collections.unmodifiableSortedMap(conditionsByLine);
+  }
 
-    public CtcMeasure build() {
-      return this;
-    }
+  public SortedMap<Long, Long> getCoveredConditionsByLine() {
+    return Collections.unmodifiableSortedMap(coveredConditionsByLine);
+  }
 
+  public CtcMeasure build() {
+    return this;
+  }
 
+  public void setMeasurePoints(long mp) {
+    measurePoints = mp;
+  }
 
-
-    long measurePoints = 0;
-
-    public void setMeasurePoints(long mp) {
-      measurePoints = mp;
-    }
-    public long getMeasurePoints() {
-      return measurePoints;
-    }
-
-
-
-
-
+  public long getMeasurePoints() {
+    return measurePoints;
+  }
 
   @Override
   public String toString() {

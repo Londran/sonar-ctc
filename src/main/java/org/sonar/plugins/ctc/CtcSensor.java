@@ -76,13 +76,13 @@ public class CtcSensor implements Sensor {
     SortedMap<Long, Long> conditionsByLine;
     SortedMap<Long, Long> coveredConditionsByLine;
 
-    java.io.File myFile = ctcMeasures.getSOURCE();
+    java.io.File myFile = ctcMeasures.getSource();
     if (myFile != null) {
       String filePath = myFile.toString();
       InputFile coveredFile = sensorContext.fileSystem().inputFile(sensorContext.fileSystem().predicates().hasPath(filePath));
       if (coveredFile != null) {
         
-        //CoreMetrics
+        // core metrics
         
         NewCoverage newCoverage = sensorContext.newCoverage().onFile(coveredFile).ofType(CoverageType.UNIT);
         
@@ -112,6 +112,9 @@ public class CtcSensor implements Sensor {
             .save();
         }
         
+        
+        // CTC++ metrics
+        
         if (ctcMeasures.getStatements() > 0) {
           sensorContext.<Integer>newMeasure()
             .forMetric(CtcMetrics.CTC_CONDITIONS_TO_COVER)
@@ -130,6 +133,8 @@ public class CtcSensor implements Sensor {
         LOG.error("File not mapped to resource! ({})", filePath);
       }
     } else {
+      
+      // CTC++ project measures
       sensorContext.<Integer>newMeasure()
         .forMetric(CtcMetrics.CTC_MEASURE_POINTS)
         .on(sensorContext.module())

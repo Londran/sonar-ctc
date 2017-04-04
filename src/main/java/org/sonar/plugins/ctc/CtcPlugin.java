@@ -20,7 +20,7 @@
 package org.sonar.plugins.ctc;
 
 import org.sonar.api.PropertyType;
-import org.sonar.api.SonarPlugin;
+import org.sonar.api.Plugin;
 import org.sonar.api.config.PropertyDefinition;
 import org.sonar.plugins.ctc.api.measures.CtcMetrics;
 import org.sonar.plugins.ctc.widgets.CtcTreemapWidget;
@@ -28,7 +28,7 @@ import org.sonar.plugins.ctc.widgets.CtcTreemapWidget;
 import java.util.Arrays;
 import java.util.List;
 
-public class CtcPlugin extends SonarPlugin {
+public class CtcPlugin implements Plugin {
 
   public static final String CTC_REPORT_PATH_KEY = "sonar.ctc.report.path";
   public static final String CTC_REPORT_TYPE_KEY = "sonar.ctc.report.type";
@@ -61,8 +61,14 @@ public class CtcPlugin extends SonarPlugin {
 
   @SuppressWarnings("rawtypes")
   @Override
-  public List getExtensions() {
-    return EXTENSIONS;
+  public void define(Context context) {
+    context.addExtensions(EXTENSIONS);
+    /*
+     if (context.getSonarQubeVersion().isGreaterThanOrEqual(Version.create(6, 0))) {
+       // Extension which supports only versions 6.0 and greater
+       // See org.sonar.api.SonarRuntime for more details.
+       context.addExtension(MyNewExtension.class);
+*/
   }
 
 }

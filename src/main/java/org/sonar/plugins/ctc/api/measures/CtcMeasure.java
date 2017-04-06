@@ -33,7 +33,7 @@ import java.util.SortedMap;
  * It could consist of file- or project-measures. If the source is NULL, then it
  * consists of project measures.
  *
- * @author Sebastian Götzinger <goetzinger@verifysoft.com>
+ * @author Sebastian Goetzinger <goetzinger@verifysoft.com>
  *
  */
 @SuppressWarnings("rawtypes")
@@ -68,7 +68,7 @@ public class CtcMeasure {
   /**
    * Returns the measured source-file.
    *
-   * @return the sourcefile or null of these are project measures
+   * @return the sourcefile or null if these are project measures
    */
   public File getSource() {
     return source;

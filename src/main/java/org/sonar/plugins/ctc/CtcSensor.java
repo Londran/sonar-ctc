@@ -75,6 +75,8 @@ public class CtcSensor implements Sensor {
     SortedMap<Long, Long> hitsByLine;
     SortedMap<Long, Long> conditionsByLine;
     SortedMap<Long, Long> coveredConditionsByLine;
+    int lineId;
+    int lineHits;
 
     java.io.File myFile = ctcMeasures.getSource();
     if (myFile != null) {
@@ -88,7 +90,9 @@ public class CtcSensor implements Sensor {
         
         hitsByLine = ctcMeasures.getHitsByLine();
         for (Map.Entry<Long, Long> entry : hitsByLine.entrySet()) {
-          newCoverage.lineHits(entry.getKey().intValue(), entry.getValue().intValue());
+          lineId = entry.getKey().intValue();
+          lineHits = entry.getValue().intValue();
+          newCoverage.lineHits(lineId, lineHits);
         }
         
         conditionsByLine = ctcMeasures.getConditionsByLine();

@@ -20,4 +20,4 @@ build_script:
 cache:
   - C:\Users\appveyor\.m2
 artifacts:
-  - path: 'sonar-ctc\target\sonar-ctc-plugin-1.2.0.jar'
+  - path: 'target\sonar-ctc-plugin-1.2.0.jar'

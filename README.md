@@ -1,4 +1,4 @@
-## CTC++ plugin for Sonarqube
+# CTC++ plugin for Sonarqube
 The plug-in allows you to import the code coverage information from [Testwell CTC++](http://www.verifysoft.com/en_ctcpp.html) into the [SonarQube](https://www.sonarqube.org) database and its visualization within the SonarQube web interface.
 
 

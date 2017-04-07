@@ -12,6 +12,10 @@ For building this plugin, you will need *maven 3.X* and *Java 8* or higher.
 ## Quickstart
 
 Provide a configuration using the file "sonar-project.properties". Set following property, besides the standard ones:
-
 **sonar.ctc.report.path=profile.txt**
 
+## Download
+
+| **AppVeyor CI** (Continuous Delivery service for Windows) | Download |
+| --- | --- | --- |
+| [![Build status](https://ci.appveyor.com/api/projects/status/32r7s2skrgm9ubva/rufinio/sonar-ctc/branch/master?svg=true)](https://ci.appveyor.com/project/rufinio/sonar-ctc)|[sonar-ctc-plugin](https://ci.appveyor.com/project/rufinio/sonar-ctc/build/artifacts) |

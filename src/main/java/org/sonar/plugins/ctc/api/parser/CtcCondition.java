@@ -20,10 +20,10 @@
 package org.sonar.plugins.ctc.api.parser;
 
 public class CtcCondition {
-  private long lineId;
-  private long conditionTrue;
-  private long conditionFalse;
-  private boolean isCondition;
+  private final long lineId;
+  private final long conditionTrue;
+  private final long conditionFalse;
+  private final boolean isCondition;
   
   public CtcCondition(long lineId, long condTrue, long condFalse, boolean isCondition) {
     this.lineId = lineId;

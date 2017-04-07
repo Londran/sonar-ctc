@@ -36,10 +36,8 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 
-//import org.sonar.plugins.ctc.api.parser.CtcCondition;
 
 import static org.sonar.plugins.ctc.api.parser.CtcResult.FILE_HEADER;
 import static org.sonar.plugins.ctc.api.parser.CtcResult.FILE_RESULT;
@@ -213,9 +211,11 @@ public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcPa
 
   private void addConditions(Entry<Long, Set<CtcCondition>> line, CtcMeasure bob) {
     long lineId = line.getKey();
-    LOG.trace("LineId: {}", lineId);
     long conditions = 0;
     long coveredConditions = 0;
+    
+    LOG.trace("LineId: {}", lineId);
+    
     for (CtcCondition result : line.getValue()) {
       
       if (result.isCondition() == true)

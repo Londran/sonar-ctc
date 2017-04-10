@@ -157,10 +157,11 @@ public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcPa
         if (blockEnd != null) {
           if (blockEnd.endsWith("-")) {
             ctcCondition = new CtcCondition(lindId, 0, 0, false);
+            line.add(ctcCondition);
           } else if (blockEnd.endsWith("+")) {
             ctcCondition = new CtcCondition(lindId, 1, 1, false);
+            line.add(ctcCondition);
           }
-          line.add(ctcCondition);
         }
       }
 

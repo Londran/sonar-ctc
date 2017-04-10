@@ -24,7 +24,6 @@ import org.sonar.api.measures.Metric;
 import org.sonar.api.measures.Metric.Builder;
 import org.sonar.api.measures.Metric.ValueType;
 import org.sonar.api.measures.Metrics;
-import org.sonar.api.measures.SumChildValuesFormula;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -48,17 +47,15 @@ public class CtcMetrics implements Metrics {
     .setDirection(Metric.DIRECTION_NONE)
     .setDomain(DOMAIN_CTC_TEST)
     .setQualitative(false)
-    .setFormula(new SumChildValuesFormula(false))
     .setDeleteHistoricalData(true)
     .create();
 
   public static final String CTC_UNCOVERED_STATEMENTS_KEY = "ctc_uncovered_statements";
-  public static final Metric<Integer> CTC_UNCOVERED_STATEMENTS = new Builder(CTC_UNCOVERED_STATEMENTS_KEY, "CTC++ uncovered statements", INT)
+  public static final Metric<Integer> CTC_UNCOVERED_STATEMENTS = new Builder(CTC_UNCOVERED_STATEMENTS_KEY, "CTC++ statements uncovered", INT)
     .setDescription("Uncovered statements by all tests")
     .setDirection(Metric.DIRECTION_WORST)
     .setQualitative(false)
     .setDomain(DOMAIN_CTC_TEST)
-    .setFormula(new SumChildValuesFormula(false))
     .create();
 
   public static final String CTC_STATEMENT_COVERAGE_KEY = "ctc_statement_coverage";
@@ -75,16 +72,14 @@ public class CtcMetrics implements Metrics {
     .setDirection(Metric.DIRECTION_BETTER)
     .setQualitative(false)
     .setDomain(DOMAIN_CTC_TEST)
-    .setFormula(new SumChildValuesFormula(false))
     .setHidden(true)
     .create();
 
   public static final String CTC_UNCOVERED_CONDITIONS_KEY = "ctc_uncovered_conditions";
-  public static final Metric<Integer> CTC_UNCOVERED_CONDITIONS = new Builder(CTC_UNCOVERED_CONDITIONS_KEY, "CTC++ uncovered conditions", INT)
+  public static final Metric<Integer> CTC_UNCOVERED_CONDITIONS = new Builder(CTC_UNCOVERED_CONDITIONS_KEY, "CTC++ conditions uncovered", INT)
     .setDescription("Uncovered conditions by all tests")
     .setDirection(Metric.DIRECTION_WORST)
     .setDomain(DOMAIN_CTC_TEST)
-    .setFormula(new SumChildValuesFormula(false))
     .create();
 
   public static final String CTC_CONDITIONS_BY_LINE_KEY = "ctc_conditions_by_line";
@@ -113,14 +108,12 @@ public class CtcMetrics implements Metrics {
     .create();
 
   // LineCoverage
-
   public static final String CTC_LINES_TO_COVER_KEY = "ctc_lines_to_cover";
   public static final Metric<Integer> CTC_LINES_TO_COVER = new Metric.Builder(CTC_LINES_TO_COVER_KEY, "Lines to cover", Metric.ValueType.INT)
     .setDescription("Lines to cover")
     .setDirection(Metric.DIRECTION_BETTER)
     .setQualitative(false)
     .setDomain(DOMAIN_CTC_TEST)
-    .setFormula(new SumChildValuesFormula(false))
     .create();
 
   public static final String CTC_UNCOVERED_LINES_KEY = "ctc_uncovered_lines";
@@ -128,7 +121,6 @@ public class CtcMetrics implements Metrics {
     .setDescription("Uncovered lines")
     .setDirection(Metric.DIRECTION_WORST)
     .setDomain(DOMAIN_CTC_TEST)
-    .setFormula(new SumChildValuesFormula(false))
     .setBestValue(0.0)
     .create();
 

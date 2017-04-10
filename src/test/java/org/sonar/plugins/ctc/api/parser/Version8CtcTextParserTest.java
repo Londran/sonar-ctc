@@ -17,21 +17,15 @@
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
-package org.sonar.plugins.ctc.api.exceptions;
+package org.sonar.plugins.ctc.api.parser;
 
-public class CtcInvalidReportException extends RuntimeException {
+import java.io.File;
 
-  /**
-   *
-   */
-  private static final long serialVersionUID = 1L;
+public class Version8CtcTextParserTest extends CtcTextParserTest {
 
-  public CtcInvalidReportException() {
-    this("CtcInvalidReportException");
-  }
-
-  public CtcInvalidReportException(String msg) {
-    super(msg);
+  @Override
+  public File getReport() {
+    return new File(CtcTextParserTest.class.getResource("report_small_v8.txt").getFile());
   }
 
 }

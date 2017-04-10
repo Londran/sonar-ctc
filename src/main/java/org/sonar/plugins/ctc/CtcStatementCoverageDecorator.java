@@ -20,14 +20,12 @@
 package org.sonar.plugins.ctc;
 
 import com.google.common.collect.ImmutableList;
-import org.sonar.api.batch.DecoratorContext;
+import org.sonar.api.ce.measure.MeasureComputer.MeasureComputerContext;
 import org.sonar.api.batch.DependsUpon;
 import org.sonar.api.config.Settings;
-import org.sonar.api.measures.Measure;
+import org.sonar.api.ce.measure.Measure;
 import org.sonar.api.measures.Metric;
 import org.sonar.plugins.ctc.api.measures.CtcMetrics;
-
-import java.util.List;
 
 @SuppressWarnings("rawtypes")
 public class CtcStatementCoverageDecorator extends CtcCoverageDecorator {
@@ -36,9 +34,12 @@ public class CtcStatementCoverageDecorator extends CtcCoverageDecorator {
     super(settings);
   }
 
-  @DependsUpon
-  public List<Metric> dependsUponMetrics() {
-    return ImmutableList.<Metric>of(CtcMetrics.CTC_UNCOVERED_STATEMENTS, CtcMetrics.CTC_STATEMENTS_TO_COVER);
+  @Override
+  public MeasureComputerDefinition define(MeasureComputerDefinitionContext def) {
+    return def.newDefinitionBuilder()
+      .setOutputMetrics(CtcMetrics.CTC_STATEMENT_COVERAGE.key())
+      .setInputMetrics(CtcMetrics.CTC_UNCOVERED_STATEMENTS.key(), CtcMetrics.CTC_STATEMENTS_TO_COVER.key())
+      .build();
   }
 
   @Override
@@ -47,9 +48,9 @@ public class CtcStatementCoverageDecorator extends CtcCoverageDecorator {
   }
 
   @Override
-  protected Integer countElements(DecoratorContext context) {
+  protected Integer countElements(MeasureComputerContext context) {
 
-    Measure measure = context.getMeasure(CtcMetrics.CTC_STATEMENTS_TO_COVER);
+    Measure measure = context.getMeasure(CtcMetrics.CTC_STATEMENTS_TO_COVER.key());
     if (measure == null) {
       return null;
     } else {
@@ -58,8 +59,8 @@ public class CtcStatementCoverageDecorator extends CtcCoverageDecorator {
   }
 
   @Override
-  protected Integer countUncoveredElements(DecoratorContext context) {
-    Measure measure = context.getMeasure(CtcMetrics.CTC_UNCOVERED_STATEMENTS);
+  protected Integer countUncoveredElements(MeasureComputerContext context) {
+    Measure measure = context.getMeasure(CtcMetrics.CTC_UNCOVERED_STATEMENTS.key());
     if (measure == null) {
       return null;
     } else {

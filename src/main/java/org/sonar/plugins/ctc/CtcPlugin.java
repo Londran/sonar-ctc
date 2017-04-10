@@ -20,7 +20,7 @@
 package org.sonar.plugins.ctc;
 
 import org.sonar.api.PropertyType;
-import org.sonar.api.SonarPlugin;
+import org.sonar.api.Plugin;
 import org.sonar.api.config.PropertyDefinition;
 import org.sonar.plugins.ctc.api.measures.CtcMetrics;
 import org.sonar.plugins.ctc.widgets.CtcTreemapWidget;
@@ -28,7 +28,7 @@ import org.sonar.plugins.ctc.widgets.CtcTreemapWidget;
 import java.util.Arrays;
 import java.util.List;
 
-public class CtcPlugin extends SonarPlugin {
+public class CtcPlugin implements Plugin {
 
   public static final String CTC_REPORT_PATH_KEY = "sonar.ctc.report.path";
   public static final String CTC_REPORT_TYPE_KEY = "sonar.ctc.report.type";
@@ -40,31 +40,35 @@ public class CtcPlugin extends SonarPlugin {
 
   @SuppressWarnings("rawtypes")
   public static final List EXTENSIONS = Arrays.asList(
-
     CtcMetrics.class,
     CtcTreemapWidget.class,
     CtcSensor.class,
     CtcConditionCoverageDecorator.class,
     CtcStatementCoverageDecorator.class,
-    CtcCoreMetricDecorator.class,
     CtcHtmlDecorator.class,
     PropertyDefinition.builder(CTC_REPORT_PATH_KEY)
-      .hidden().defaultValue("report.txt").type(PropertyType.STRING).name("CTC_REPORT_PATH").build(),
+    .hidden().defaultValue("report.txt").type(PropertyType.STRING).name("CTC_REPORT_PATH").build(),
     PropertyDefinition.builder(CTC_REPORT_TYPE_KEY)
-      .hidden().type(PropertyType.SINGLE_SELECT_LIST).options("TXT").name("CTC_REPORT_TYPE").build(),
+    .hidden().type(PropertyType.SINGLE_SELECT_LIST).options("TXT").name("CTC_REPORT_TYPE").build(),
     PropertyDefinition.builder(CTC_DISABLE_SENSOR_KEY)
-      .hidden().type(PropertyType.BOOLEAN).defaultValue(FALSE_LITERAL).name("CTC_DISABLE_SENSOR").build(),
+    .hidden().type(PropertyType.BOOLEAN).defaultValue(FALSE_LITERAL).name("CTC_DISABLE_SENSOR").build(),
     PropertyDefinition.builder(CTC_DISABLE_DECORATOR_KEY)
-      .hidden().type(PropertyType.BOOLEAN).defaultValue(FALSE_LITERAL).name("CTC_DISABLE_DECORATOR").build(),
+    .hidden().type(PropertyType.BOOLEAN).defaultValue(FALSE_LITERAL).name("CTC_DISABLE_DECORATOR").build(),
     PropertyDefinition.builder(CTC_CORE_METRIC_KEY)
-      .defaultValue(FALSE_LITERAL).name("Core Metric").description("Should Testwell CTC++ replace the core metrics?").category("Code Coverage").subCategory("CTC++")
-      .type(PropertyType.BOOLEAN).build()
-    );
+    .defaultValue(FALSE_LITERAL).name("Core Metric").description("Should Testwell CTC++ replace the core metrics?").category("Code Coverage").subCategory("CTC++")
+    .type(PropertyType.BOOLEAN).build()
+  );
 
   @SuppressWarnings("rawtypes")
   @Override
-  public List getExtensions() {
-    return EXTENSIONS;
+  public void define(Context context) {
+    context.addExtensions(EXTENSIONS);
+    /*
+     if (context.getSonarQubeVersion().isGreaterThanOrEqual(Version.create(6, 0))) {
+       // Extension which supports only versions 6.0 and greater
+       // See org.sonar.api.SonarRuntime for more details.
+       context.addExtension(MyNewExtension.class);
+*/
   }
 
 }

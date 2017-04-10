@@ -25,7 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonar.plugins.ctc.api.exceptions.CtcInvalidReportException;
 import org.sonar.plugins.ctc.api.measures.CtcMeasure;
-import org.sonar.plugins.ctc.api.measures.CtcMeasure.FileMeasureBuilder;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -37,8 +36,8 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
+
 
 import static org.sonar.plugins.ctc.api.parser.CtcResult.FILE_HEADER;
 import static org.sonar.plugins.ctc.api.parser.CtcResult.FILE_RESULT;
@@ -54,12 +53,11 @@ public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcPa
   private static final int MP_GROUP = 3;
   private static final int STMNT_TO_COVER_GROUP = 4;
   private static final int STMNT_COVERED_GROUP = 3;
+  private static final int LINE_NR_GROUP = 3;
   private final Scanner scanner;
   private final Matcher matcher;
   private State state;
-  private final CtcMeasure.ProjectMeasureBuilder projectBuilder;
-
-  private static final int LINE_NR_GROUP = 3;
+  private final CtcMeasure projectBuilder;
 
   private enum State {
     BEGIN,
@@ -73,7 +71,7 @@ public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcPa
     scanner = new Scanner(report).useDelimiter(SECTION_SEP);
     matcher = CtcResult.FILE_HEADER.matcher("");
     state = State.BEGIN;
-    projectBuilder = new CtcMeasure.ProjectMeasureBuilder();
+    projectBuilder = new CtcMeasure(null);
   }
 
   @Override
@@ -117,7 +115,7 @@ public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcPa
 
   private CtcMeasure parseFileUnit() {
     File file = new File("./" + matcher.group(1));
-    CtcMeasure.FileMeasureBuilder bob = FileMeasureBuilder.create(file);
+    CtcMeasure bob = new CtcMeasure(file);
     try {
       addLines(bob);
     } catch (NoSuchElementException e) {
@@ -129,72 +127,115 @@ public class CtcTextParser extends AbstractIterator<CtcMeasure> implements CtcPa
     return bob.build();
   }
 
-  private void addEachLine(Map<Long, Set<MatchResult>> buffer) {
+  private void addEachLine(Map<Long, Set<CtcCondition>> buffer) {
+    long nextLineId;
+    String condsTrue;
+    String condsFalse;
+    CtcCondition lastCtcCondition = null;
+    CtcCondition ctcCondition = null;
+    
     do {
-      long last = Long.parseLong(matcher.group(LINE_NR_GROUP));
-      Set<MatchResult> line = buffer.get(last);
+      long lindId = Long.parseLong(matcher.group(LINE_NR_GROUP));
+      Set<CtcCondition> line = buffer.get(lindId);
       if (line == null) {
-        line = new HashSet<MatchResult>();
-        buffer.put(Long.parseLong(matcher.group(LINE_NR_GROUP)), line);
+        line = new HashSet<CtcCondition>();
+        buffer.put(lindId, line);
+      }        
+      
+      condsTrue = matcher.group(TRUE_CONDS);
+      condsFalse = matcher.group(FALSE_CONDS);
+      if ((condsTrue != null) || (condsFalse != null)) {
+        ctcCondition = new CtcCondition(lindId, 
+          (condsTrue != null ? new BigDecimal(condsTrue).longValueExact() : 0), 
+          (condsFalse != null ? new BigDecimal(condsFalse).longValueExact() : 0), 
+          (condsTrue != null && condsFalse != null));
+        line.add(ctcCondition);
       }
-      LOG.trace("Added line: {}", matcher.toMatchResult());
-      line.add(matcher.toMatchResult());
+      else
+      {
+        String blockEnd = matcher.group(4);
+        if (blockEnd != null) {
+          if (blockEnd.endsWith("-")) {
+            ctcCondition = new CtcCondition(lindId, 0, 0, false);
+            line.add(ctcCondition);
+          } else if (blockEnd.endsWith("+")) {
+            ctcCondition = new CtcCondition(lindId, 1, 1, false);
+            line.add(ctcCondition);
+          }
+        }
+      }
+
+      if (lastCtcCondition != null) {
+        nextLineId = lastCtcCondition.getLineId() + 1;
+        while (nextLineId < lindId) {
+          line.add(new CtcCondition(nextLineId, 0, lastCtcCondition.getConditionFalse(), false));
+          nextLineId++;
+        }
+        buffer.put(nextLineId, line);
+      }
+      lastCtcCondition = ctcCondition;
     } while (matcher.find());
   }
 
-  private void parseLineSection(Map<Long, Set<MatchResult>> buffer) {
+  private void parseLineSection(Map<Long, Set<CtcCondition>> buffer) {
     LOG.trace("Found linesection...");
+    
     if (matcher.usePattern(LINE_RESULT).find(FROM_START)) {
       addEachLine(buffer);
-
-    } else {
+    } else  {
       LOG.error("Neither File Result nor Line Result after FileHeader!");
       LOG.trace("Matcher: {}", matcher);
       throw new CtcInvalidReportException("Neither FileResult nor FileHeader.");
     }
   }
 
-  private void addLines(CtcMeasure.FileMeasureBuilder bob) throws NoSuchElementException {
+  private void addLines(CtcMeasure bob) throws NoSuchElementException {
     LOG.trace("Adding lines...");
-    Map<Long, Set<MatchResult>> buffer = new TreeMap<Long, Set<MatchResult>>();
+    Map<Long, Set<CtcCondition>> buffer = new TreeMap<Long, Set<CtcCondition>>();
     while (!matcher.reset(scanner.next()).usePattern(FILE_RESULT).find()) {
       parseLineSection(buffer);
     }
     LOG.trace("Found matches: {}", buffer);
-    for (Entry<Long, Set<MatchResult>> line : buffer.entrySet()) {
+    
+    for (Entry<Long, Set<CtcCondition>> line : buffer.entrySet()) {
       addConditions(line, bob);
+      addLineHit(line, bob);
+    }
+  }
+  
+  private void addLineHit(Entry<Long, Set<CtcCondition>> line, CtcMeasure bob) {
+
+    for (CtcCondition result : line.getValue()) {
+        bob.setHits(result.getLineId(), result.getLineHits());
     }
   }
 
-  private void addConditions(Entry<Long, Set<MatchResult>> line, CtcMeasure.FileMeasureBuilder bob) {
+  private void addConditions(Entry<Long, Set<CtcCondition>> line, CtcMeasure bob) {
     long lineId = line.getKey();
-    LOG.trace("LineId: {}", lineId);
     long conditions = 0;
     long coveredConditions = 0;
-    for (MatchResult result : line.getValue()) {
-      String s = result.group(FALSE_CONDS);
-
-      if (s != null) {
-        conditions++;
-        if (new BigDecimal(s).longValueExact() > 0) {
+    
+    LOG.trace("LineId: {}", lineId);
+    
+    for (CtcCondition result : line.getValue()) {
+      
+      if (result.isCondition() == true)
+      {
+        conditions += 2;
+        if (result.getConditionFalse() > 0) {
           coveredConditions++;
         }
-      }
-      s = result.group(TRUE_CONDS);
-
-      if (s != null) {
-        conditions++;
-        if (new BigDecimal(s).longValueExact() > 0) {
+        if (result.getConditionTrue() > 0) {
           coveredConditions++;
         }
+        
+        LOG.trace("Conditioncoverage: {}/{}", coveredConditions, conditions);
+        bob.setConditions(lineId, conditions, coveredConditions);
       }
     }
-    LOG.trace("Conditioncoverage: {}/{}", coveredConditions, conditions);
-    bob.setConditions(lineId, conditions, coveredConditions);
-
   }
 
-  private void addStatements(CtcMeasure.FileMeasureBuilder bob) {
+  private void addStatements(CtcMeasure bob) {
     try {
       long covered = Long.parseLong(matcher.group(STMNT_COVERED_GROUP));
       long statement = Long.parseLong(matcher.group(STMNT_TO_COVER_GROUP));

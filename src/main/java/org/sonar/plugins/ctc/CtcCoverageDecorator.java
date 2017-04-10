@@ -21,15 +21,12 @@ package org.sonar.plugins.ctc;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonar.api.batch.CoverageExtension;
-import org.sonar.api.batch.Decorator;
-import org.sonar.api.batch.DecoratorContext;
+import org.sonar.api.ce.measure.MeasureComputer;
+import org.sonar.api.ce.measure.MeasureComputer.MeasureComputerContext;
 import org.sonar.api.config.Settings;
 import org.sonar.api.measures.Metric;
-import org.sonar.api.resources.Project;
-import org.sonar.api.resources.Resource;
 
-public abstract class CtcCoverageDecorator implements Decorator, CoverageExtension {
+public abstract class CtcCoverageDecorator implements MeasureComputer {
 
   private static final double WHOLE = 100.0;
   protected final Settings settings;
@@ -40,23 +37,17 @@ public abstract class CtcCoverageDecorator implements Decorator, CoverageExtensi
   }
 
   @Override
-  public boolean shouldExecuteOnProject(Project project) {
-
-    return !settings.getBoolean(CtcPlugin.CTC_DISABLE_DECORATOR_KEY);
-  }
-
-  @Override
-  public void decorate(Resource resource, DecoratorContext context) {
-    LOG.trace("Decorating resource: {}", resource);
+  public void compute(MeasureComputerContext context) {
+    LOG.trace("Compunting resource: {}", context);
     computeMeasure(context);
   }
 
-  private void computeMeasure(DecoratorContext context) {
-    if (context.getMeasure(getGeneratedMetric()) == null) {
+  private void computeMeasure(MeasureComputerContext context) {
+    if (context.getMeasure(getGeneratedMetric().key()) == null) {
       Integer elements = countElements(context);
       if (elements != null && elements > 0L) {
         Integer uncoveredElements = countUncoveredElements(context);
-        context.saveMeasure(getGeneratedMetric(), calculateCoverage(uncoveredElements, elements));
+        context.addMeasure(getGeneratedMetric().key(), calculateCoverage(uncoveredElements, elements));
       }
     }
   }
@@ -68,8 +59,8 @@ public abstract class CtcCoverageDecorator implements Decorator, CoverageExtensi
   @SuppressWarnings("rawtypes")
   protected abstract Metric getGeneratedMetric();
 
-  protected abstract Integer countElements(DecoratorContext context);
+  protected abstract Integer countElements(MeasureComputerContext context);
 
-  protected abstract Integer countUncoveredElements(DecoratorContext context);
+  protected abstract Integer countUncoveredElements(MeasureComputerContext context);
 
 }
